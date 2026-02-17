@@ -1,0 +1,69 @@
+name: .NET
+
+on:
+  push:
+    branches: [ "develop" ]
+
+permissions:
+  id-token: write
+  contents: read
+  checks: write
+  
+jobs:
+  build:
+    runs-on: windows-latest
+      
+    steps:
+    # Checkout the repository
+    - uses: actions/checkout@v4
+
+    # Check if .NET SDK 8.0.x is already installed (PowerShell compatible)
+    - name: Check if .NET SDK is already installed
+      id: dotnet-check
+      run: |
+        $sdks = dotnet --list-sdks
+        if ($sdks -match "8\.0\.") {
+          Write-Output "SDK already installed."
+        }
+        else {
+          Write-Output "SDK not installed, setting it up."
+          exit 1
+        }
+
+    # Conditionally setup .NET SDK if not already installed
+    - name: Setup .NET
+      if: failure()
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        cache: true
+
+    # Restore dependencies only if needed
+    - name: Restore dependencies PCBS
+      run: dotnet restore ./PCBS/PCBS.csproj
+
+          # Restore dependencies only if needed
+    - name: Restore dependencies PCBSTests
+      run: dotnet restore ./PCBSTests/PCBSTests.csproj
+      
+    # Build the project without restoring dependencies
+    - name: Build PCBS project
+      run: dotnet build ./PCBS/PCBS.csproj
+
+    # Build the project without restoring dependencies
+    - name: Build PCBSTests project
+      run: dotnet build ./PCBSTests/PCBSTests.csproj
+
+    - name: Test
+      run: dotnet test ./PCBSTests/PCBSTests.csproj --logger "trx;LogFileName=test-results.trx" || true
+
+      
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: DotNET Tests
+        path: "**/test-results.trx"                            
+        reporter: dotnet-trx
+        fail-on-error: true
+     
