@@ -26,7 +26,6 @@ function App() {
 
   const lang: Lang = useMemo(() => getLangFromUrl(), []);
   const dir = useMemo(() => dirFromLang(lang), [lang]);
-  const dir = useMemo(() => dirFromLang(lang), [lang]);
 
   // Mobile UX: after selecting from dropdown, auto-scroll to chart after a short delay (small screens only)
   const chartScrollTimerRef = useRef<number | null>(null);
@@ -90,9 +89,7 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
     const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, { attributes: true, childList: true, subtree: true });
 
-    return (
-    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
-) => {
+    return () => {
       window.removeEventListener('resize', sendHeight);
       observer.disconnect();
     };
@@ -334,7 +331,7 @@ URL.revokeObjectURL(url);
     return (
     <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4" />
           <p className="text-xl font-bold text-gray-700">{lang === 'en' ? 'Loading…' : 'جاري التحميل...'}</p>
@@ -346,7 +343,7 @@ URL.revokeObjectURL(url);
   return (
     <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
 
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="max-w-[1800px] mx-auto p-6">
         <header className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl lg:text-4xl font-black text-blue-900 leading-tight">
@@ -357,7 +354,7 @@ URL.revokeObjectURL(url);
           </p>
             <div className="mt-4 mx-auto max-w-4xl">
               <div
-                className="text-right text-gray-800"
+                className={`${dir === 'rtl' ? 'text-right' : 'text-left'} text-gray-800`}
                 style={{
                   fontSize: "15px",
                   display: "flex",
@@ -372,7 +369,7 @@ URL.revokeObjectURL(url);
                 </p>
             
                 <p className="font-semibold">
-                  <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/2/2026
+                  <span className="text-gray-700">{t('nextUpdate', lang)}</span> {lang === 'en' ? 'Monday, 23/2/2026' : 'الاثنين الموافق 23/2/2026'}
                 </p>
               </div>
             </div>
