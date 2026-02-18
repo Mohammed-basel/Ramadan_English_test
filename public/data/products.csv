@@ -5,7 +5,7 @@ id,name,icon,color,reference_price,display_order,weight,Unit,Item
 11210102,لحم عجل طازج,,,65.0,4,1 كغم,1 kg,Fresh veal
 11210201,لحم عجل مجمد,,,32.0,5,1 كغم,1 kg,Frozen veal
 11220102,دجاج منظف,,,17.0,6,1 كغم,1 kg,Chicken
-11420303,جبة غنم بيضاء,,,23.0,7,1 كغم,1 kg,White lamb cheese
+11420303,جبنة غنم بيضاء,,,23.0,7,1 كغم,1 kg,White lamb cheese
 11420308,جبنة بقرية ذات تصنيع آلي,,,9.472222222222223,8,وقية - 250 غم,1 ounce - 250 g,Cow cheese
 11430001,بيض دجاج,,,19.770833333333332,9,2 كغم,2 kg,Chicken eggs
 11510203,زيت الذرة,,,25.0,10,3 لتر,3 liters,Corn oil
