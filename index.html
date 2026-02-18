@@ -1,9 +1,22 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-root">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>لوحة بيانات أسعار السلع</title>
+    <title id="page-title">لوحة بيانات أسعار السلع</title>
+    <script>
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search || '');
+          if ((params.get('lang') || '').toLowerCase() === 'en') {
+            var html = document.getElementById('html-root');
+            if (html) { html.setAttribute('lang', 'en'); html.setAttribute('dir', 'ltr'); }
+            var title = document.getElementById('page-title');
+            if (title) title.textContent = 'Commodity Price Dashboard';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <meta property="og:image" content="https://bolt.new/static/og_default.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />

@@ -58,7 +58,7 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
     return Array.from({ length: maxWeek }, (_, i) => {
       const w = i + 1;
       const weekDate = map.get(w);
-      return { w, label: formatWeekLabel(w, 'ar', weekDate) };
+      return { w, label: formatWeekLabel(w, lang, weekDate) };
     });
   }, [products, maxWeek]);
 
@@ -94,14 +94,6 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
       observer.disconnect();
     };
   }, []);
-
-  // Apply language + direction to the whole document
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = dir;
-    // Also set on body for safety in some embed/iframe cases
-    document.body.setAttribute('dir', dir);
-  }, [lang, dir]);
 
   const useSampleData = () => {
     const sorted = [...sampleProducts].sort((a, b) => sortArabic(a.name, b.name));
@@ -255,28 +247,8 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
 
   const exportToExcel = async () => {
     const headers = lang === 'en'
-    ? [
-        'Commodity',
-        'Week',
-        'Weekly price',
-        'Indicative price',
-        'Change vs indicative %',
-        'Change vs indicative (NIS)',
-        'Previous week price',
-        'Change vs previous week %',
-        'Change vs previous week (NIS)',
-      ]
-    : [
-        'المنتج',
-        'الأسبوع',
-        'السعر الأسبوعي',
-        'السعر الاسترشادي',
-        'التغيّر عن الاسترشادي %',
-        'التغيّر عن الاسترشادي (NIS)',
-        'السعر للأسبوع السابق',
-        'التغيّر عن الأسبوع السابق %',
-        'التغيّر عن الأسبوع السابق (NIS)',
-      ];
+      ? ['Commodity', 'Week', 'Weekly Price', 'Indicative Price', '% Change vs Indicative', 'NIS Change vs Indicative', 'Previous Week Price', '% Change vs Previous', 'NIS Change vs Previous']
+      : ['المنتج', 'الأسبوع', 'السعر الأسبوعي', 'السعر الاسترشادي', 'التغيّر عن الاسترشادي %', 'التغيّر عن الاسترشادي (NIS)', 'السعر للأسبوع السابق', 'التغيّر عن الأسبوع السابق %', 'التغيّر عن الأسبوع السابق (NIS)'];
 
     const rows = filteredProducts.map((product) => {
       const weekPrice = product.prices.find((p) => p.week_number === currentWeek)?.price ?? 0;
@@ -329,21 +301,17 @@ URL.revokeObjectURL(url);
 
   if (loading) {
     return (
-    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center" dir={dir}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4" />
-          <p className="text-xl font-bold text-gray-700">{lang === 'en' ? 'Loading…' : 'جاري التحميل...'}</p>
+          <p className="text-xl font-bold text-gray-700">{lang === 'en' ? 'Loading...' : 'جاري التحميل...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
-
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50" dir={dir}>
       <div className="max-w-[1800px] mx-auto p-6">
         <header className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl lg:text-4xl font-black text-blue-900 leading-tight">
@@ -354,7 +322,7 @@ URL.revokeObjectURL(url);
           </p>
             <div className="mt-4 mx-auto max-w-4xl">
               <div
-                className={`${dir === 'rtl' ? 'text-right' : 'text-left'} text-gray-800`}
+                className={`text-gray-800 ${lang === 'en' ? 'text-left' : 'text-right'}`}
                 style={{
                   fontSize: "15px",
                   display: "flex",
@@ -365,11 +333,14 @@ URL.revokeObjectURL(url);
                 }}
               >
                 <p className="font-semibold">
-                  <span className="text-gray-700">{t('currentUpdate', lang)}</span> 17/2/2026
+                  <span className="text-gray-700">{t('currentUpdate', lang)}</span>
                 </p>
             
                 <p className="font-semibold">
-                  <span className="text-gray-700">{t('nextUpdate', lang)}</span> {lang === 'en' ? 'Monday, 23/2/2026' : 'الاثنين الموافق 23/2/2026'}
+                  {lang === 'en'
+                    ? <><span className="text-gray-700">Next Update:</span> Monday, 23/2/2026</>
+                    : <><span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/2/2026</>
+                  }
                 </p>
               </div>
             </div>
@@ -379,7 +350,10 @@ URL.revokeObjectURL(url);
 
         {usingSampleData && (
           <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            {lang === 'en' ? <>Showing sample data. To use real data, place CSV files in <span className="font-bold">/data/</span> on the server (products.csv and weekly_prices.csv).</> : <>يتم عرض بيانات تجريبية. لعرض البيانات الحقيقية ضع ملفات CSV داخل مجلد <span className="font-bold">/data/</span> على الخادم (products.csv و weekly_prices.csv).</>}
+            {lang === 'en'
+              ? <>Sample data is being displayed. To show real data, place CSV files inside the <span className="font-bold">/data/</span> folder on the server (products.csv and weekly_prices.csv).</>
+              : <>يتم عرض بيانات تجريبية. لعرض البيانات الحقيقية ضع ملفات CSV داخل مجلد <span className="font-bold">/data/</span> على الخادم (products.csv و weekly_prices.csv).</>
+            }
           </div>
         )}
 
@@ -393,7 +367,6 @@ URL.revokeObjectURL(url);
         adherencePercent={manualAdherence}
       />
         <ProductTicker
-          lang={lang}
           products={products}
           currentWeek={currentWeek}
           selectedId={selectedId}
@@ -434,8 +407,8 @@ URL.revokeObjectURL(url);
                   }`}
                 >
                   <option value="all">{lang === 'en' ? 'All' : 'الكل'}</option>
-                  <option value="increase">{lang === 'en' ? 'Increase' : 'ارتفاع الأسعار'}</option>
-                  <option value="decrease">{lang === 'en' ? 'Decrease' : 'انخفاض الأسعار'}</option>
+                  <option value="increase">{lang === 'en' ? 'Price increase' : 'ارتفاع الأسعار'}</option>
+                  <option value="decrease">{lang === 'en' ? 'Price decrease' : 'انخفاض الأسعار'}</option>
                   <option value="stable">{lang === 'en' ? 'Stable' : 'مستقرة'}</option>
                 </select>
               </div>
@@ -466,7 +439,7 @@ URL.revokeObjectURL(url);
           </div>
 
 <div className="mt-3 text-sm text-gray-600 flex items-center gap-2 whitespace-nowrap leading-none">
-  <span className="font-semibold">{lang === 'en' ? 'Number of commodities:' : 'عدد السلع:'}</span>
+  <span className="font-semibold">{lang === 'en' ? 'Commodities:' : 'عدد السلع:'}</span>
   <span className="font-bold text-blue-600">{filteredProducts.length}</span>
 
   <span className="mx-2 text-gray-300">|</span>
@@ -517,9 +490,11 @@ URL.revokeObjectURL(url);
         </div>
                 {/* Weekly updates + official contact */}
         <div className="mt-5 space-y-3">
-          <div className={`bg-blue-50 border border-blue-200 rounded-xl p-3 ${dir === 'rtl' ? 'text-right' : 'text-left'} text-sm leading-6`}>
-            {lang === 'en' ? 'Ministry of National Economy complaints number:' : 'رقم وزارة الاقتصاد الوطني لتقديم الشكاوى:'}
-            <span className="font-black mr-2">129</span>
+          <div className={`bg-blue-50 border border-blue-200 rounded-xl p-3 ${lang === 'en' ? 'text-left' : 'text-right'} text-sm leading-6`}>
+            {lang === 'en'
+              ? <>Ministry of National Economy complaints number: <span className="font-black ml-2">129</span></>
+              : <>رقم وزارة الاقتصاد الوطني لتقديم الشكاوى: <span className="font-black mr-2">129</span></>
+            }
           </div>
         </div>
       </div>
