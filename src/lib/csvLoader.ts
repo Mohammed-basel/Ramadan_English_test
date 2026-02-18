@@ -18,20 +18,12 @@ import { Lang } from './lang';
 
 interface CSVProduct {
   id: string;
-  /** Arabic name */
-  name?: string;
-  /** English name */
-  Item?: string;
-
-  icon?: string;
-  color?: string;
-  reference_price?: number;
-  display_order?: number;
-
-  /** Arabic unit/weight */
+  name: string;
+  icon: string;
+  color: string;
+  reference_price: number;
+  display_order: number;
   weight?: string;
-  /** English unit/weight */
-  Unit?: string;
 }
 
 interface CSVPrice {
@@ -196,24 +188,13 @@ export async function loadDataFromCSV(lang: Lang = 'ar'): Promise<ProductWithPri
 
     const products = productsRaw.map((p: any) => {
       const id = normalizeId(p.id);
-      const arName = String(p.name ?? '');
-      const enName = String(p.Item ?? '');
-      const name =
-        lang === 'en'
-          ? (enName || arName)
-          : (NAME_OVERRIDES[id] ?? arName);
-
-      const arWeight = p.weight ? String(p.weight) : undefined;
-      const enWeight = p.Unit ? String(p.Unit) : undefined;
-      const weight = lang === 'en' ? (enWeight || arWeight) : arWeight;
-
       return {
         ...p,
         id,
-        name,
+        name: lang === 'en' ? String((p as any).Item ?? '') : (NAME_OVERRIDES[id] ?? String((p as any).name ?? '')),
         icon: String(p.icon ?? ''),
         color: String(p.color ?? ''),
-        weight,
+        weight: (lang === 'en' ? ((p as any).Unit ? String((p as any).Unit) : undefined) : (p.weight ? String(p.weight) : undefined)),
         reference_price: Number(p.reference_price) || 0,
         display_order: Number(p.display_order) || 0,
       };

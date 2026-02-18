@@ -1,21 +1,66 @@
 import { Lang } from './lang';
 
 export const STRINGS = {
-  headerTitle: { ar: "منصة رصد أسعار بعض السلع الأساسية خلال شهر رمضان المبارك", en: "A platform for monitoring the prices of some basic commodities during the holy month \u201cRamadan\u201d" },
-  headerSubtitle: { ar: "متابعة وتحليل أسعار السلع الاستهلاكية المختارة خلال شهر رمضان", en: "Monitoring and analyzing the prices of selected consumer goods during the holy  month \u201cRamadan\u201d" },
-  kpiCompliance: { ar: "نسبة الالتزام بالسعر الاسترشادي", en: "Rate of compliance with the indicative price" },
-  kpiLowCommitment: { ar: "مستوى التزام منخفض", en: "Low level of commitment" },
-  kpiMaxIncrease: { ar: "أعلى نسبة ارتفاع عن السعر الاسترشادي", en: "Highest percentage increase above the indicative price" },
-  kpiMaxDecrease: { ar: "أكبر نسبة انخفاض عن السعر الاسترشادي", en: "Largest percentage decrease from the indicative price" },
-  kpiHighCommitment: { ar: 'مستوى التزام مرتفع', en: 'High level of commitment' },
-  kpiNeedsMonitoring: { ar: 'يحتاج متابعة', en: 'Needs monitoring' },
-  viewDetails: { ar: 'عرض التفاصيل', en: 'View details' },
-  close: { ar: 'إغلاق', en: 'Close' },
-  methodologySummary: { ar: 'عرض موجز للمنهجية والمفاهيم والمتغيرات والتغطية الجغرافية والفترة الزمنية.', en: 'A brief overview of the methodology, concepts, variables, geographic coverage, and time period.' },
-  weeklyComparedToIndicative: { ar: 'عن الاسترشادي - أسبوع', en: 'Compared to indicative - Week' },
-
-  methodologyTitle: { ar: "المنهجية", en: "Methodology" },
-  methodologyText: { ar: `العنوان: حركة أسعار سلع أساسية مختارة خلال شهر رمضان المبارك
+  headerTitle: {
+    ar: "منصة رصد أسعار أهم السلع الأساسية خلال شهر رمضان المبارك",
+    en: "A platform for monitoring the prices of important basic commodities during the holy month “Ramadan”",
+  },
+  headerSubtitle: {
+    ar: "متابعة وتحليل أسعار السلع الاستهلاكية المختارة خلال شهر رمضان",
+    en: "Monitoring and analyzing the prices of selected consumer goods during the holy month “Ramadan”",
+  },
+  currentUpdate: {
+    ar: "التحديث الحالي: 17/2/2026",
+    en: "Current Update: 17/2/2026",
+  },
+  nextUpdate: {
+    ar: "التحديث القادم: الاثنين، 23/2/2026",
+    en: "Next Update: Monday, 23/2/2026",
+  },
+  complaints: {
+    ar: "رقم شكاوى وزارة الاقتصاد الوطني: 129",
+    en: "Ministry of National Economy Complaints Number: 129",
+  },
+  kpiComplianceTitle: {
+    ar: "نسبة الالتزام بالسعر الاسترشادي",
+    en: "Rate of compliance with the indicative price",
+  },
+  kpiLowCompliance: {
+    ar: "مستوى التزام منخفض",
+    en: "Low level of commitment",
+  },
+  kpiMaxIncrease: {
+    ar: "أعلى نسبة ارتفاع عن السعر الاسترشادي",
+    en: "Highest percentage increase above the indicative price",
+  },
+  kpiMaxDecrease: {
+    ar: "أكبر نسبة انخفاض عن السعر الاسترشادي",
+    en: "Largest percentage decrease from the indicative price",
+  },
+  methodologyTitle: {
+    ar: "المنهجية",
+    en: "Methodology",
+  },
+  methodologyHint: {
+    ar: "عرض موجز للمنهجية والمفاهيم والمتغيرات والتغطية الجغرافية والفترة الزمنية.",
+    en: "A brief overview of the methodology, concepts, variables, geographic coverage, and time period.",
+  },
+  searchPlaceholder: {
+    ar: "ابحث عن سلعة...",
+    en: "Search for a commodity...",
+  },
+  filterAll: { ar: "الكل", en: "All" },
+  filterIncrease: { ar: "ارتفاع", en: "Increase" },
+  filterDecrease: { ar: "انخفاض", en: "Decrease" },
+  filterStable: { ar: "مستقر", en: "Stable" },
+  downloadImage: { ar: "تحميل صورة الرسم", en: "Download chart image" },
+  downloadExcel: { ar: "تحميل البيانات (Excel)", en: "Download data (Excel)" },
+  selectFromList: {
+    ar: "اختر سلعة من القائمة لعرض الرسم البياني.",
+    en: "Select a commodity from the list to view the chart.",
+  },
+  methodologyText: {
+    ar: `العنوان: حركة أسعار سلع أساسية مختارة خلال شهر رمضان المبارك
 المصدر: الجهاز المركزي للإحصاء الفلسطيني
 الشركاء: وزارة الاقتصاد الوطني، وجمعية حماية المستهلك الفلسطينية
 
@@ -52,7 +97,11 @@ export const STRINGS = {
 
 سلع مستقرة أسعارها: تعني بأن السعر المرصود للسلعة مساوي للسعر الاسترشادي ويظهر نسبة تغير صفرية.
 
-سلعة منخفضة أسعارها: تعني بأن السعر المرصود أقل من السعر الاسترشادي ويظهر نسبة تغير سلبية.`, en: `Title: Price Movements of Selected Basic Commodities During the Holy Month "Ramadan"
+سلعة منخفضة أسعارها: تعني بأن السعر المرصود أقل من السعر الاسترشادي ويظهر نسبة تغير سلبية.
+
+نسب التغير ومستويات الأسعار أسبوعيا للسلع الأساسية خلال شهر رمضان مقارنة بالأسعار الاسترشادية
+`,
+    en: `Title: Price Movements of Selected Basic Commodities During the Holy Month "Ramadan"
 Source: Palestinian Central Bureau of Statistics
 Partners: Ministry of National Economy, Palestinian Society for Consumer Protection
 
@@ -72,52 +121,30 @@ Methodology:
 • Approximately 1,650 price observations, averaging 412 price quotes per week, were collected for these commodities to achieve the broadest possible geographical coverage and reflect price variations across the West Bank markets.
 • Data was collected from approximately 600 retail outlets distributed throughout the period across the various governorates.
 • Price rates are calculated at the commodity level, and the average price is compared weekly with the indicative price and with the average price of the previous week, so that weekly changes in price rates and the degree of compliance with the indicative prices for those commodities are monitored.
-• Determining the indicative Price (Ministry of Economy):
+• Determining the Indicative Price (Ministry of Economy):
 1. Twenty-five essential commodities, particularly those consumed during Ramadan, were selected for this purpose.
 2. In the first phase, prices for these commodities were collected from retail outlets. These outlets were comprised of three types of stores (small, medium, and large), and prices were collected from all governorates in the West Bank.
 3. The prices were compiled, and the data was checked for logic. An average, the highest price, and the lowest price were calculated. Any anomalies were investigated and verified in the field.
 4. In the second phase, prices for some of these commodities were collected from major wholesalers and distributors to ensure fair pricing for both consumers and retailers.
 
 Concepts:
-Rate of compliance with the indicative price: The compliance ratio calculated by dividing the total number of goods that show a change of less than 5% when comparing their observed price to the indicative price by the total number of goods (25 selected goods).
+Rate of compliance with the indicative price: The compliance ratio calculated by dividing the total number of goods that show a change of less than 5% when comparing their observed price to the interactive price by the total number of goods (25 selected goods).
 
-Compliant Goods: These goods show a change of less than 5% when comparing their observed price to the indicative price.
+Compliant Goods: These goods show a change of less than 5% when comparing their observed price to the interactive price.
 
-Non-Compliant Goods: These goods show a change of more than 5% when comparing their observed price to the indicative price.
+Non-Compliant Goods: These goods show a change of more than 5% when comparing their observed price to the interactive price.
 
-Highly Priced Goods: This means that the observed price is higher than the indicative price and shows a positive percentage change.
+Highly Priced Goods: This means that the observed price is higher than the interactive price and shows a positive percentage change.
 
-Stability Priced Goods: This means that the observed price of the good is equal to the indicative price and shows a zero percentage change.
+Stability Priced Goods: This means that the observed price of the good is equal to the interactive price and shows a zero percentage change.
 
-Undervalued Goods: This means that the observed price is lower than the indicative price and shows a negative percentage change.` },
-  chartTitle: { ar: "نسب التغير ومستويات الأسعار أسبوعيا للسلع الأساسية خلال شهر رمضان مقارنة بالأسعار الاسترشادية", en: "Rates of change and weekly price levels for basic commodities during Ramadan compared to indicative prices" },
+Undervalued Goods: This means that the observed price is lower than the interactive price and shows a negative percentage change.
 
-  currentUpdateLabel: { ar: 'التحديث الحالي:', en: 'Current Update:' },
-  nextUpdateLabel: { ar: 'التحديث القادم:', en: 'Next Update:' },
-  complaintsLabel: { ar: 'رقم شكاوى وزارة الاقتصاد الوطني:', en: 'Ministry of National Economy Complaints Number:' },
-
-
-  selectProduct: { ar: 'اختيار السلعة', en: 'Select item' },
-  priceChangeFilter: { ar: 'تغير السعر', en: 'Price change' },
-  weekLabel: { ar: 'الأسبوع', en: 'Week' },
-  all: { ar: 'الكل', en: 'All' },
-  increase: { ar: 'ارتفاع الأسعار', en: 'Price increase' },
-  decrease: { ar: 'انخفاض الأسعار', en: 'Price decrease' },
-  stable: { ar: 'مستقرة', en: 'Stable' },
-  downloadExcel: { ar: 'تنزيل Excel', en: 'Download Excel' },
-  downloadChart: { ar: 'تنزيل الرسم', en: 'Download chart' },
-  viewAll: { ar: 'الكل', en: 'All' },
-  viewPrice: { ar: 'السعر', en: 'Price' },
-  viewChange: { ar: 'التغير', en: 'Change' },
-  indicativePrice: { ar: 'السعر الإرشادي', en: 'Indicative price' },
-  displayedWeek: { ar: 'الأسبوع المعروض', en: 'Displayed week' },
-  loading: { ar: 'جاري التحميل...', en: 'Loading...' },
-  sampleDataWarning: {
-    ar: 'يتم عرض بيانات تجريبية. لعرض البيانات الحقيقية ضع ملفات CSV داخل مجلد /data/ على الخادم.',
-    en: 'Sample data is being displayed. To show real data, place the CSV files inside the /data/ folder on the server.'
+Rates of change and weekly price levels for basic commodities during Ramadan compared to indicative prices
+`,
   },
 } as const;
 
 export function t<K extends keyof typeof STRINGS>(key: K, lang: Lang): string {
-  return STRINGS[key][lang] as unknown as string;
+  return STRINGS[key][lang];
 }

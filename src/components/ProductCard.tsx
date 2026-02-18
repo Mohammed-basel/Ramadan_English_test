@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import { ProductWithPrices } from '../types';
-import { Lang, dirFromLang } from '../lib/lang';
+import { Lang } from '../lib/lang';
 import { t } from '../lib/i18n';
 import { getProductColor, getProductIcon } from '../lib/productMeta';
 
 interface ProductCardProps {
+  lang: Lang;
   product: ProductWithPrices;
   isSelected: boolean;
   isDimmed?: boolean;
@@ -13,7 +14,6 @@ interface ProductCardProps {
   isHighestIncrease?: boolean;
   isLowestDecrease?: boolean;
   currentWeek: number;
-  lang: Lang;
 }
 
 function formatSignedPercent(v: number, decimals = 1) {
@@ -62,6 +62,7 @@ function pickIconUrl(baseUrl: string, id: string | number) {
 }
 
 export function ProductCard({
+  lang,
   product,
   isSelected,
   isDimmed,
@@ -69,7 +70,6 @@ export function ProductCard({
   isHighestIncrease,
   isLowestDecrease,
   currentWeek,
-  lang,
 }: ProductCardProps) {
   const weekPrice = Number(product.prices?.find((p: any) => p.week_number === currentWeek)?.price ?? 0);
   const prevPrice =
@@ -90,8 +90,6 @@ export function ProductCard({
   const iconValue = getProductIcon(product);
   const colorValue = getProductColor(product);
 
-  const dir = dirFromLang(lang);
-
   const baseUrl = import.meta.env.BASE_URL || '/';
   const iconUrl = pickIconUrl(baseUrl, product.id);
   const hasImageIcon = Boolean(iconUrl);
@@ -110,9 +108,8 @@ export function ProductCard({
 
   return (
     <button
-      dir={dir}
       onClick={onToggle}
-      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 ${lang === 'ar' ? 'text-right' : 'text-left'} w-full border-2 ${
+      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 text-left w-full border-2 ${
         isSelected ? 'border-blue-600 shadow-2xl' : 'border-transparent hover:border-gray-200'
       } ${isLargeChange ? 'relative overflow-hidden' : ''} ${
         isDimmed && !isSelected ? 'opacity-40 grayscale' : ''
@@ -191,7 +188,7 @@ export function ProductCard({
             <span className={`${refBadge.text}`}>→</span>
           )}
 
-          <span className={`${refBadge.text}`}>{lang === 'en' ? 'Vs indicative:' : 'عن الاسترشادي:'} {formatSignedPercent(pctRef, 1)}</span>
+          <span className={`${refBadge.text}`}>عن الاسترشادي: {formatSignedPercent(pctRef, 1)}</span>
 
           <span className="text-gray-500 font-semibold">({formatSignedMoney(diffRef, 2)} NIS)</span>
         </div>
@@ -210,7 +207,7 @@ export function ProductCard({
           )}
 
           <span className={`${prevBadge.text}`}>
-            {lang === 'en' ? 'Vs previous week:' : 'عن الأسبوع السابق:'} {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
+            عن الأسبوع السابق: {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
           </span>
 
           {currentWeek !== 1 && (
@@ -222,10 +219,10 @@ export function ProductCard({
       {/* ✅ FOOTER */}
       <div className="flex justify-between items-center text-sm text-gray-600 pt-3 border-t border-gray-100 text-right mt-4">
         <div>
-          <span className="font-semibold">{t('indicativePrice', lang)}: </span>
+          <span className="font-semibold">{t('kpiComplianceTitle', lang)}: </span>
           <span className="font-bold">NIS {refPrice.toFixed(2)}</span>
         </div>
-        <div className="text-gray-500">{t('weekLabel', lang)} {currentWeek}</div>
+        <div className="text-gray-500">الأسبوع {currentWeek}</div>
       </div>
     </button>
   );
