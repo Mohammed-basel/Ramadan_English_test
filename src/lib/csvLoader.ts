@@ -2,6 +2,7 @@
 // Replaces Supabase - reads CSV/JSON files served by the same PCBS server
 
 import { ProductWithPrices } from '../types';
+import { Lang } from './lang';
 
 /**
  * Loads data from files served from the public site.
@@ -17,12 +18,20 @@ import { ProductWithPrices } from '../types';
 
 interface CSVProduct {
   id: string;
-  name: string;
-  icon: string;
-  color: string;
-  reference_price: number;
-  display_order: number;
+  /** Arabic name */
+  name?: string;
+  /** English name */
+  Item?: string;
+
+  icon?: string;
+  color?: string;
+  reference_price?: number;
+  display_order?: number;
+
+  /** Arabic unit/weight */
   weight?: string;
+  /** English unit/weight */
+  Unit?: string;
 }
 
 interface CSVPrice {
@@ -162,7 +171,7 @@ function parseCSV<T>(csvText: string): T[] {
  * Optional env:
  * - VITE_DATA_PATH=/some/path/   (must end with /)
  */
-export async function loadDataFromCSV(): Promise<ProductWithPrices[]> {
+export async function loadDataFromCSV(lang: Lang = 'ar'): Promise<ProductWithPrices[]> {
   try {
     const baseUrl = import.meta.env.BASE_URL || '/';
     const dataPath = import.meta.env.VITE_DATA_PATH || `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}data/`;
@@ -187,13 +196,24 @@ export async function loadDataFromCSV(): Promise<ProductWithPrices[]> {
 
     const products = productsRaw.map((p: any) => {
       const id = normalizeId(p.id);
+      const arName = String(p.name ?? '');
+      const enName = String(p.Item ?? '');
+      const name =
+        lang === 'en'
+          ? (enName || arName)
+          : (NAME_OVERRIDES[id] ?? arName);
+
+      const arWeight = p.weight ? String(p.weight) : undefined;
+      const enWeight = p.Unit ? String(p.Unit) : undefined;
+      const weight = lang === 'en' ? (enWeight || arWeight) : arWeight;
+
       return {
         ...p,
         id,
-        name: NAME_OVERRIDES[id] ?? String(p.name ?? ''),
+        name,
         icon: String(p.icon ?? ''),
         color: String(p.color ?? ''),
-        weight: p.weight ? String(p.weight) : undefined,
+        weight,
         reference_price: Number(p.reference_price) || 0,
         display_order: Number(p.display_order) || 0,
       };

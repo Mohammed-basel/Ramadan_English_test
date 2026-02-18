@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import { ProductWithPrices } from '../types';
-import { getProductColor, getProductIcon } from '../lib/productMeta';
-import { Lang } from '../lib/lang';
+import { Lang, dirFromLang } from '../lib/lang';
 import { t } from '../lib/i18n';
+import { getProductColor, getProductIcon } from '../lib/productMeta';
 
 interface ProductCardProps {
   product: ProductWithPrices;
@@ -13,7 +13,6 @@ interface ProductCardProps {
   isHighestIncrease?: boolean;
   isLowestDecrease?: boolean;
   currentWeek: number;
-  lang: Lang;
 }
 
 function formatSignedPercent(v: number, decimals = 1) {
@@ -32,6 +31,35 @@ function formatSignedMoney(n: number, decimals = 2) {
   return `${sign}${Math.abs(n).toFixed(decimals)}`;
 }
 
+/**
+ * ✅ Build-time list of existing icon files.
+ * We use Vite's import.meta.glob to detect which files exist,
+ * then render <i> immediately for products without an icon,
+ * avoiding any 404 network requests.
+ */
+const EXISTING_ICON_PATHS = new Set(
+  Object.keys(import.meta.glob('/public/icons/*.{png,svg}', { eager: true })).map((p) =>
+    p.replace('/public', '') // "/icons/11100107.png"
+  )
+);
+
+function makeIconPath(baseUrl: string, file: string) {
+  const b = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  const f = file.startsWith('/') ? file.slice(1) : file;
+  return `${b}${f}`;
+}
+
+function pickIconUrl(baseUrl: string, id: string | number) {
+  const sid = String(id);
+  const png = `/icons/${sid}.png`;
+  const svg = `/icons/${sid}.svg`;
+
+  if (EXISTING_ICON_PATHS.has(png)) return makeIconPath(baseUrl, png);
+  if (EXISTING_ICON_PATHS.has(svg)) return makeIconPath(baseUrl, svg);
+
+  return null;
+}
+
 export function ProductCard({
   product,
   isSelected,
@@ -40,7 +68,6 @@ export function ProductCard({
   isHighestIncrease,
   isLowestDecrease,
   currentWeek,
-  lang,
 }: ProductCardProps) {
   const weekPrice = Number(product.prices?.find((p: any) => p.week_number === currentWeek)?.price ?? 0);
   const prevPrice =
@@ -62,25 +89,15 @@ export function ProductCard({
   const colorValue = getProductColor(product);
 
   const baseUrl = import.meta.env.BASE_URL || '/';
-  const iconPng = `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}icons/${product.id}.png`;
-  const iconSvg = `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}icons/${product.id}.svg`;
+  const iconUrl = pickIconUrl(baseUrl, product.id);
+  const hasImageIcon = Boolean(iconUrl);
 
-  const [iconSrc, setIconSrc] = useState<string>(iconPng);
-  const [iconBroken, setIconBroken] = useState(false);
-
+  // Optional verification (remove if you don't want console logs)
   useEffect(() => {
-    setIconSrc(iconPng);
-    setIconBroken(false);
+    // This will only log for products using <i> fallback (no icon file)
+    // console.log('[ICON:FALLBACK <i>]', product.id, product.name, iconValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product.id, baseUrl]);
-
-  const handleIconError = () => {
-    if (iconSrc.endsWith('.png')) {
-      setIconSrc(iconSvg);
-      return;
-    }
-    setIconBroken(true);
-  };
+  }, [hasImageIcon, product.id]);
 
   const refBadge = badgeStyle(pctRef);
   const prevBadge = badgeStyle(pctPrev);
@@ -89,8 +106,9 @@ export function ProductCard({
 
   return (
     <button
+      dir={dir}
       onClick={onToggle}
-      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 text-left w-full border-2 ${
+      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 ${lang === 'ar' ? 'text-right' : 'text-left'} w-full border-2 ${
         isSelected ? 'border-blue-600 shadow-2xl' : 'border-transparent hover:border-gray-200'
       } ${isLargeChange ? 'relative overflow-hidden' : ''} ${
         isDimmed && !isSelected ? 'opacity-40 grayscale' : ''
@@ -102,12 +120,13 @@ export function ProductCard({
 
       <div className="flex items-center gap-4 mb-4 relative">
         <div className="relative">
-          {!iconBroken ? (
+          {hasImageIcon ? (
             <img
-              src={iconSrc}
+              src={iconUrl!}
               alt=""
-              className={`w-14 h-14 object-contain transition-transform duration-300 ${isSelected ? 'scale-100' : ''}`}
-              onError={handleIconError}
+              className={`w-14 h-14 object-contain transition-transform duration-300 ${
+                isSelected ? 'scale-100' : ''
+              }`}
               draggable={false}
             />
           ) : (
@@ -142,11 +161,10 @@ export function ProductCard({
         </div>
       </div>
 
+      {/* ✅ PRICE */}
       <div className="text-center mb-3">
         <div
-          className={`text-4xl font-black mb-2 transition-all duration-300 ${
-            isSelected ? 'scale-110' : ''
-          }`}
+          className={`text-4xl font-black mb-2 transition-all duration-300 ${isSelected ? 'scale-110' : ''}`}
           style={{ color: colorValue }}
         >
           <span dir="ltr" className="inline-flex items-baseline whitespace-nowrap tabular-nums">
@@ -156,6 +174,7 @@ export function ProductCard({
         </div>
       </div>
 
+      {/* ✅ Excel-like badges */}
       <div className="flex flex-wrap justify-center gap-2">
         <div
           className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg font-bold text-sm border ${refBadge.bg} ${refBadge.border}`}
@@ -168,7 +187,7 @@ export function ProductCard({
             <span className={`${refBadge.text}`}>→</span>
           )}
 
-          <span className={`${refBadge.text}`}>{t('vsIndicative', lang)}: {formatSignedPercent(pctRef, 1)}</span>
+          <span className={`${refBadge.text}`}>{lang === 'en' ? 'Vs indicative:' : 'عن الاسترشادي:'} {formatSignedPercent(pctRef, 1)}</span>
 
           <span className="text-gray-500 font-semibold">({formatSignedMoney(diffRef, 2)} NIS)</span>
         </div>
@@ -187,7 +206,7 @@ export function ProductCard({
           )}
 
           <span className={`${prevBadge.text}`}>
-            {t('vsPreviousWeek', lang)}: {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
+            {lang === 'en' ? 'Vs previous week:' : 'عن الأسبوع السابق:'} {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
           </span>
 
           {currentWeek !== 1 && (
@@ -196,6 +215,7 @@ export function ProductCard({
         </div>
       </div>
 
+      {/* ✅ FOOTER */}
       <div className="flex justify-between items-center text-sm text-gray-600 pt-3 border-t border-gray-100 text-right mt-4">
         <div>
           <span className="font-semibold">{t('indicativePrice', lang)}: </span>

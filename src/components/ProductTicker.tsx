@@ -1,13 +1,15 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
-import { Lang } from '../lib/lang';
+import { FaqButton } from './FaqButton';
+import { FaqModal } from './FaqModal';
+import { Lang, dirFromLang } from '../lib/lang';
+
 
 interface PriceEntry {
   week_number: number;
   price: number | string;
   week_date?: string;
 }
-
 export interface ProductWithPrices {
   id: string | number;
   name: string;
@@ -16,90 +18,223 @@ export interface ProductWithPrices {
   prices: PriceEntry[];
 }
 
-function getLatestPrice(p: ProductWithPrices, week: number): number {
-  const v = p.prices?.find((x) => x.week_number === week)?.price;
-  return Number(v ?? 0);
+function getLatestPriceUpToWeek(p: ProductWithPrices, week: number): number {
+  if (!p.prices || p.prices.length === 0) return 0;
+  const candidate = [...p.prices]
+    .filter((x) => x.week_number <= week)
+    .sort((a, b) => b.week_number - a.week_number)[0];
+  return Number(candidate?.price ?? 0);
 }
 
-function getPrevPrice(p: ProductWithPrices, week: number): number {
-  if (week <= 1) return 0;
-  const v = p.prices?.find((x) => x.week_number === week - 1)?.price;
-  return Number(v ?? 0);
+function format2(n: number): string {
+  if (!Number.isFinite(n)) return '0.00';
+  return n.toFixed(2);
 }
 
-function computeDirection(current: number, prev: number): 'up' | 'down' | 'flat' {
-  const diff = current - prev;
-  if (diff > 0) return 'up';
-  if (diff < 0) return 'down';
-  return 'flat';
+function formatWeekDate(iso?: string) {
+  if (!iso) return '';
+  const clean = iso.split('T')[0];
+  const [y, m, d] = clean.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
 }
 
-interface ProductTickerProps {
+export function ProductTicker({
+  products,
+  currentWeek,
+  maxItems = 25,
+  onSelectProduct,
+  selectedId,
+}: {
   products: ProductWithPrices[];
   currentWeek: number;
-  selectedId: string | null;
-  onSelectProduct: (id: string) => void;
-  lang: Lang;
-}
+  maxItems?: number;
+  onSelectProduct?: (id: string | number) => void;
+  selectedId?: string | null;
+  lang?: Lang;
+}) {
+  const dir = dirFromLang(lang ?? 'ar');
+  const isAr = (lang ?? 'ar') === 'ar';
+  const [faqOpen, setFaqOpen] = useState(false);
+  const baseItems = useMemo(() => {
+    return [...products]
+      .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+      .map((p) => {
+        const price = getLatestPriceUpToWeek(p, currentWeek);
+        const ref = Number(p.reference_price ?? 0);
+        const hasRef = Number.isFinite(ref) && ref > 0;
+        const diff = hasRef ? price - ref : 0;
+        const pct = hasRef ? (diff / ref) * 100 : 0;
+        return { id: p.id, name: p.name, price, ref, hasRef, diff, pct };
+      })
+      .slice(0, maxItems);
+  }, [products, currentWeek, maxItems]);
 
-export function ProductTicker({ products, currentWeek, selectedId, onSelectProduct, lang }: ProductTickerProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const items = useMemo(() => {
-    return products.map((p) => {
-      const cur = getLatestPrice(p, currentWeek);
-      const prev = getPrevPrice(p, currentWeek);
-      const dir = computeDirection(cur, prev);
-      const diff = cur - prev;
-      const pct = prev > 0 ? (diff / prev) * 100 : 0;
-      return { ...p, cur, prev, dir, diff, pct };
-    });
+  const weekDateIso = useMemo(() => {
+    for (const p of products) {
+      const row = p.prices?.find((x) => x.week_number === currentWeek && x.week_date);
+      if (row?.week_date) return row.week_date;
+    }
+    return undefined;
   }, [products, currentWeek]);
 
-  const label = lang === 'ar' ? 'متوسط أسعار الأسبوع' : 'Weekly average prices';
+  const trackItems = useMemo(() => [...baseItems, ...baseItems], [baseItems]);
+  if (!baseItems.length) return null;
+
+  // Drag-to-scroll
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragState = useRef({
+    startX: 0,
+    startScrollLeft: 0,
+    moved: false,
+  });
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    dragState.current.startX = e.pageX;
+    dragState.current.startScrollLeft = el.scrollLeft;
+    dragState.current.moved = false;
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const el = viewportRef.current;
+    if (!el) return;
+
+    e.preventDefault();
+    const dx = e.pageX - dragState.current.startX;
+    if (Math.abs(dx) > 3) dragState.current.moved = true;
+
+    requestAnimationFrame(() => {
+      el.scrollLeft = dragState.current.startScrollLeft - dx;
+    });
+  };
+
+  const stopDrag = () => setIsDragging(false);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    setIsDragging(true);
+    dragState.current.startX = e.touches[0].pageX;
+    dragState.current.startScrollLeft = el.scrollLeft;
+    dragState.current.moved = false;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const el = viewportRef.current;
+    if (!el) return;
+
+    const dx = e.touches[0].pageX - dragState.current.startX;
+    if (Math.abs(dx) > 3) dragState.current.moved = true;
+
+    requestAnimationFrame(() => {
+      el.scrollLeft = dragState.current.startScrollLeft - dx;
+    });
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-      <div className="flex items-center justify-between gap-3 mb-2">
-        <div className="font-extrabold text-gray-800">{label} {currentWeek}</div>
+    <div className="bg-white rounded-xl shadow-lg p-5 mb-6" dir={dir} >
+      {/* Header */}
+      <div className="flex justify-between items-center" dir={dir}>
+        <div className="text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg px-3 py-1">
+          {lang === 'en' ? `Average prices for week ${currentWeek}` : `متوسط أسعار الأسبوع ${currentWeek}`}
+          {weekDateIso && (
+            <span className="text-gray-500 font-medium whitespace-nowrap tabular-nums" dir="ltr">
+              {' '}({formatWeekDate(weekDateIso)})
+            </span>
+          )}
+        </div>
+      <FaqButton lang={lang ?? 'ar'} onClick={() => setFaqOpen(true)} />
+      <FaqModal lang={lang ?? 'ar'} open={faqOpen} onClose={() => setFaqOpen(false)} />
       </div>
 
+      {/* Ticker */}
       <div
-        ref={containerRef}
-        className="overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
+        className="mt-3 rounded-lg border border-gray-200 bg-gray-50 py-3 overflow-hidden shadow-sm"
+        dir={dir}
       >
-        <div className={`flex gap-4 whitespace-nowrap ${isPaused ? '' : 'animate-ticker'}`}>
-          {items.concat(items).map((p, idx) => {
-            const active = selectedId && String(p.id) === String(selectedId);
-            const Icon = p.dir === 'up' ? ArrowUp : p.dir === 'down' ? ArrowDown : Minus;
+        <div className={`ticker-viewport relative ${isDragging ? 'is-dragging' : ''}`}>
+          <div
+            ref={viewportRef}
+            className={`overflow-x-auto overflow-y-hidden select-none ${
+              isDragging ? 'cursor-grabbing' : 'cursor-grab'
+            }`}
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+            }}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={stopDrag}
+            onMouseLeave={stopDrag}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={stopDrag}
+            onTouchCancel={stopDrag}
+            onDragStart={(e) => e.preventDefault()}
+            onWheel={(e) => {
+              const el = viewportRef.current;
+              if (!el) return;
+              if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                el.scrollLeft += e.deltaY;
+              }
+            }}
+          >
+            <div className="ticker-track">
+              {trackItems.map((it, idx) => {
+                const above = it.hasRef && it.price > it.ref + 0.0001;
+                const under = it.hasRef && it.price < it.ref - 0.0001;
 
-            return (
-              <button
-                key={`${p.id}-${idx}`}
-                onClick={() => onSelectProduct(String(p.id))}
-                className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border transition-all ${
-                  active ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <span className="font-bold text-gray-800">{p.name}</span>
-                <span className="text-gray-500 tabular-nums">{p.cur.toFixed(2)}</span>
+                return (
+                  <div
+                    key={`${it.id}-${idx}`}
+                    onClick={() => {
+                      if (dragState.current.moved) return;
+                      onSelectProduct?.(it.id);
+                    }}
+                    className={`inline-flex items-center gap-3 bg-white border border-gray-100 rounded-full px-4 py-1.5 mx-2 shadow-sm shrink-0 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition ${
+                      selectedId === it.id ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                  >
+                    <span className="text-sm font-bold text-gray-800">{it.name}</span>
+                    <div className="h-4 w-[1px] bg-gray-200" />
 
-                <span
-                  className={`inline-flex items-center gap-1 font-bold tabular-nums ${
-                    p.dir === 'up' ? 'text-red-700' : p.dir === 'down' ? 'text-green-700' : 'text-gray-600'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {p.prev > 0 ? `${p.pct > 0 ? '+' : p.pct < 0 ? '−' : ''}${Math.abs(p.pct).toFixed(1)}%` : '—'}
-                </span>
-              </button>
-            );
-          })}
+                    <div className="flex items-center gap-1 flex-row-reverse">
+                      {above && <ArrowUp className="w-3.5 h-3.5 text-red-600 stroke-[3px]" />}
+                      {under && <ArrowDown className="w-3.5 h-3.5 text-green-600 stroke-[3px]" />}
+                      {!above && !under && <Minus className="w-3.5 h-3.5 text-gray-400" />}
+
+                      <span
+                        dir="ltr"
+                        className={`inline-flex items-baseline whitespace-nowrap tabular-nums font-black ${
+                          above ? 'text-red-700' : under ? 'text-green-700' : 'text-gray-600'
+                        }`}
+                      >
+                        <span className="text-sm">{format2(it.price)}</span>
+                        <span className="ml-[2px] text-[11px] font-semibold">NIS</span>
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* fades */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
         </div>
       </div>
+
+      {/* hide scrollbar for webkit */}
+      <style>{`
+        .ticker-viewport > div::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 }

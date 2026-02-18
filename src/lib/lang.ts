@@ -1,21 +1,30 @@
 export type Lang = 'ar' | 'en';
 
-export function getLang(): Lang {
-  // 1) Query string takes priority: ?lang=en
+export function getLangFromPathname(pathname: string = window.location.pathname): Lang {
+  const p = (pathname || '').toLowerCase();
+  // Treat any URL containing /en/ or ending with /en as English
+  if (p.includes('/en/') || p.endsWith('/en')) return 'en';
+  return 'ar';
+}
+
+/**
+ * Determine language from URL.
+ * Priority:
+ * 1) ?lang=en|ar
+ * 2) pathname (/en/)
+ * Default: ar
+ */
+export function getLangFromUrl(url: string = window.location.href): Lang {
   try {
-    const p = new URLSearchParams(window.location.search);
-    const q = (p.get('lang') || '').toLowerCase();
+    const u = new URL(url);
+    const q = (u.searchParams.get('lang') || '').toLowerCase().trim();
     if (q === 'en') return 'en';
     if (q === 'ar') return 'ar';
+    return getLangFromPathname(u.pathname);
   } catch {
-    // ignore
+    // Fallback for very old browsers / unusual environments
+    return getLangFromPathname(window.location.pathname);
   }
-
-  // 2) Path-based fallback: /en/ or ends with /en
-  const pathname = (window.location.pathname || '').toLowerCase();
-  if (pathname.includes('/en/') || pathname.endsWith('/en')) return 'en';
-
-  return 'ar';
 }
 
 export function dirFromLang(lang: Lang): 'rtl' | 'ltr' {

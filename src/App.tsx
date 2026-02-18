@@ -6,15 +6,19 @@ import { KPICards } from './components/KPICards';
 import { ProductTicker } from './components/ProductTicker';
 import { sampleProducts } from './data/sampleProducts';
 import { loadDataFromCSV } from './lib/csvLoader';
+import { getLangFromUrl, dirFromLang, Lang } from './lib/lang';
+import { t } from './lib/i18n';
+import { UpdateInfo } from './components/UpdateInfo';
 import { formatWeekLabel } from './lib/weekLabels';
 import { calculatePriceChange, getChangeCategory } from './lib/calc';
 import { ProductWithPrices } from './types';
-import { getLang, dirFromLang, Lang } from './lib/lang';
-import { t } from './lib/i18n';
 
 type FilterType = 'all' | 'increase' | 'decrease' | 'stable';
 
 function App() {
+  const lang: Lang = getLangFromUrl();
+  const dir = dirFromLang(lang);
+
   const [products, setProducts] = useState<ProductWithPrices[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,9 +26,7 @@ function App() {
   const [currentWeek, setCurrentWeek] = useState<number>(1);
   const [maxWeek, setMaxWeek] = useState<number>(1);
   const [usingSampleData, setUsingSampleData] = useState(false);
-
-  const lang: Lang = useMemo(() => getLang(), []);
-  const dir = dirFromLang(lang);
+  const [faqOpen, setFaqOpen] = useState(false);
 
   // Mobile UX: after selecting from dropdown, auto-scroll to chart after a short delay (small screens only)
   const chartScrollTimerRef = useRef<number | null>(null);
@@ -57,11 +59,11 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
     return Array.from({ length: maxWeek }, (_, i) => {
       const w = i + 1;
       const weekDate = map.get(w);
-      return { w, label: formatWeekLabel(w, lang as any, weekDate) };
+      return { w, label: formatWeekLabel(w, 'ar', weekDate) };
     });
   }, [products, maxWeek]);
 
-  const sortName = (a: string, b: string) => a.localeCompare(b, lang, { sensitivity: 'base' });
+  const sortByLang = (a: string, b: string) => a.localeCompare(b, lang, { sensitivity: 'base' });
 
   const getMaxWeek = (items: ProductWithPrices[]) =>
     Math.max(...items.flatMap((p) => p.prices.map((pr) => pr.week_number)), 1);
@@ -95,7 +97,7 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
   }, []);
 
   const useSampleData = () => {
-    const sorted = [...sampleProducts].sort((a, b) => sortName(a.name, b.name));
+    const sorted = [...sampleProducts].sort((a, b) => sortByLang(a.name, b.name));
     const mw = getMaxWeek(sorted);
     setProducts(sorted);
     setMaxWeek(mw);
@@ -110,10 +112,10 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
   async function loadData() {
     setLoading(true);
     try {
-      const data = await loadDataFromCSV();
+      const data = await loadDataFromCSV(lang);
       if (!data || data.length === 0) throw new Error('No data found in CSV files');
 
-      const sorted = [...data].sort((a, b) => sortName(a.name, b.name));
+      const sorted = [...data].sort((a, b) => sortByLang(a.name, b.name));
       const mw = getMaxWeek(sorted);
       setProducts(sorted);
       setMaxWeek(mw);
@@ -134,11 +136,6 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
   useEffect(() => {
     loadData();
   }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    document.documentElement.dir = dir;
-  }, [lang, dir]);
 
   const scrollToProduct = (id: string) => {
     // First try the wrapper element id, then fallback to the button id.
@@ -250,17 +247,29 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
   }, [allPriceChanges]);
 
   const exportToExcel = async () => {
-    const headers = [
-      'المنتج',
-      'الأسبوع',
-      'السعر الأسبوعي',
-      'السعر الاسترشادي',
-      'التغيّر عن الاسترشادي %',
-      'التغيّر عن الاسترشادي (NIS)',
-      'السعر للأسبوع السابق',
-      'التغيّر عن الأسبوع السابق %',
-      'التغيّر عن الأسبوع السابق (NIS)',
-    ];
+    const headers = lang === 'en'
+      ? [
+          'Item',
+          'Week',
+          'Weekly price',
+          'Indicative price',
+          'Change vs indicative %',
+          'Change vs indicative (NIS)',
+          'Previous week price',
+          'Change vs previous week %',
+          'Change vs previous week (NIS)',
+        ]
+      : [
+          'المنتج',
+          'الأسبوع',
+          'السعر الأسبوعي',
+          'السعر الاسترشادي',
+          'التغيّر عن الاسترشادي %',
+          'التغيّر عن الاسترشادي (NIS)',
+          'السعر للأسبوع السابق',
+          'التغيّر عن الأسبوع السابق %',
+          'التغيّر عن الأسبوع السابق (NIS)',
+        ];
 
     const rows = filteredProducts.map((product) => {
       const weekPrice = product.prices.find((p) => p.week_number === currentWeek)?.price ?? 0;
@@ -313,7 +322,7 @@ URL.revokeObjectURL(url);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center" dir={dir}>
+      <div dir={dir} className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4" />
           <p className="text-xl font-bold text-gray-700">{t('loading', lang)}</p>
@@ -323,7 +332,7 @@ URL.revokeObjectURL(url);
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50" dir={dir}>
+    <div dir={dir} className={`min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
       <div className="max-w-[1800px] mx-auto p-6">
         <header className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl lg:text-4xl font-black text-blue-900 leading-tight">
@@ -332,6 +341,29 @@ URL.revokeObjectURL(url);
           <p className="text-lg text-gray-600 font-semibold mt-3">
             {t('headerSubtitle', lang)}
           </p>
+            <div className="mt-4 mx-auto max-w-4xl">
+              <div
+                className="text-right text-gray-800"
+                style={{
+                  fontSize: "15px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <p className="font-semibold">
+                  <span className="text-gray-700">التحديث الحالي:</span> 17/2/2026
+                </p>
+            
+                <p className="font-semibold">
+                  <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/2/2026
+                </p>
+              </div>
+            </div>
+
+
         </header>
 
         {usingSampleData && (
@@ -340,20 +372,20 @@ URL.revokeObjectURL(url);
           </div>
         )}
 
-      <KPICards
+
+
+      <KPICards lang={lang} 
         products={products}
         currentWeek={currentWeek}
         maxIncrease={maxIncrease}
         maxDecrease={maxDecrease}
         adherencePercent={manualAdherence}
-        lang={lang}
       />
-        <ProductTicker
+        <ProductTicker lang={lang} 
           products={products}
           currentWeek={currentWeek}
           selectedId={selectedId}
           onSelectProduct={(id) => selectProduct(String(id), 'dropdown')}
-          lang={lang}
         />
         <div className="bg-white rounded-xl shadow-lg p-5 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
@@ -378,7 +410,7 @@ URL.revokeObjectURL(url);
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700 mb-2">{t('priceChange', lang)}</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{t('priceChangeFilter', lang)}</label>
               <div className="flex gap-2">
                 <Filter className="text-gray-400 w-5 h-5 self-center" />
                 <select
@@ -422,7 +454,7 @@ URL.revokeObjectURL(url);
           </div>
 
 <div className="mt-3 text-sm text-gray-600 flex items-center gap-2 whitespace-nowrap leading-none">
-  <span className="font-semibold">{t('itemCount', lang)}:</span>
+  <span className="font-semibold">{lang === 'en' ? 'Number of items:' : 'عدد السلع:'}</span>
   <span className="font-bold text-blue-600">{filteredProducts.length}</span>
 
   <span className="mx-2 text-gray-300">|</span>
@@ -455,7 +487,6 @@ URL.revokeObjectURL(url);
                     isHighestIncrease={maxIncrease?.product.id === product.id}
                     isLowestDecrease={maxDecrease?.product.id === product.id}
                     currentWeek={currentWeek}
-                    lang={lang}
                   />
                 </div>
               ))}
@@ -464,12 +495,19 @@ URL.revokeObjectURL(url);
 
           <div id="chart-section">
             {selectedProduct ? (
-              <PriceChart products={[selectedProduct]} currentWeek={currentWeek} lang={lang} />
+              <PriceChart language={lang}  products={[selectedProduct]} currentWeek={currentWeek} />
             ) : (
               <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                <p className="text-xl text-gray-500 font-semibold">اختر سلعة من القائمة لعرض الرسم البياني</p>
+                <p className="text-xl text-gray-500 font-semibold">{lang === 'en' ? 'Select an item from the list to view the chart' : 'اختر سلعة من القائمة لعرض الرسم البياني'}</p>
               </div>
             )}
+          </div>
+        </div>
+                {/* Weekly updates + official contact */}
+        <div className="mt-5 space-y-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-right text-sm leading-6">
+            {lang === 'en' ? 'Ministry of National Economy complaints number:' : 'رقم وزارة الاقتصاد الوطني لتقديم الشكاوى:'}
+            <span className="font-black mr-2">129</span>
           </div>
         </div>
       </div>
