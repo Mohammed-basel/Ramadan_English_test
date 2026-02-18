@@ -188,7 +188,7 @@ export function ProductCard({
             <span className={`${refBadge.text}`}>→</span>
           )}
 
-          <span className={`${refBadge.text}`}>عن الاسترشادي: {formatSignedPercent(pctRef, 1)}</span>
+          <span className={`${refBadge.text}`}>{lang === 'en' ? 'vs indicative:' : 'عن الاسترشادي:'}  {formatSignedPercent(pctRef, 1)}</span>
 
           <span className="text-gray-500 font-semibold">({formatSignedMoney(diffRef, 2)} NIS)</span>
         </div>
@@ -207,7 +207,7 @@ export function ProductCard({
           )}
 
           <span className={`${prevBadge.text}`}>
-            عن الأسبوع السابق: {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
+            {lang === 'en' ? 'vs previous week:' : 'عن الأسبوع السابق:'}  {currentWeek === 1 ? '—' : formatSignedPercent(pctPrev, 1)}
           </span>
 
           {currentWeek !== 1 && (
@@ -222,7 +222,7 @@ export function ProductCard({
           <span className="font-semibold">{t('kpiComplianceTitle', lang)}: </span>
           <span className="font-bold">NIS {refPrice.toFixed(2)}</span>
         </div>
-        <div className="text-gray-500">الأسبوع {currentWeek}</div>
+        <div className="text-gray-500">{lang === 'en' ? `Week ${currentWeek}` : `الأسبوع ${currentWeek}`}</div>
       </div>
     </button>
   );

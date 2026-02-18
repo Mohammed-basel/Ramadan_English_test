@@ -140,25 +140,27 @@ export function ProductTicker({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-5 mb-6" dir={dir} >
+    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+
+    <div className="bg-white rounded-xl shadow-lg p-5 mb-6" dir="rtl" >
       {/* Header */}
-      <div className="flex justify-between items-center" dir={dir}>
+      <div className="flex justify-between items-center" dir="rtl">
         <div className="text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg px-3 py-1">
-          {lang === 'en' ? `Average prices – Week ${currentWeek}` : `متوسط أسعار الأسبوع ${currentWeek}`}
+          {lang === 'en' ? `Average prices - Week ${currentWeek}` : `متوسط أسعار الأسبوع ${currentWeek}`}
           {weekDateIso && (
             <span className="text-gray-500 font-medium whitespace-nowrap tabular-nums" dir="ltr">
               {' '}({formatWeekDate(weekDateIso)})
             </span>
           )}
         </div>
-      <FaqButton onClick={() => setFaqOpen(true)} />
+      <FaqButton onClick={() => setFaqOpen(true)} lang={lang} />
       <FaqModal open={faqOpen} onClose={() => setFaqOpen(false)} lang={lang} />
       </div>
 
       {/* Ticker */}
       <div
         className="mt-3 rounded-lg border border-gray-200 bg-gray-50 py-3 overflow-hidden shadow-sm"
-        dir={dir}
+        dir="rtl"
       >
         <div className={`ticker-viewport relative ${isDragging ? 'is-dragging' : ''}`}>
           <div
@@ -193,6 +195,8 @@ export function ProductTicker({
                 const under = it.hasRef && it.price < it.ref - 0.0001;
 
                 return (
+    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+
                   <div
                     key={`${it.id}-${idx}`}
                     onClick={() => {
@@ -237,6 +241,7 @@ export function ProductTicker({
       <style>{`
         .ticker-viewport > div::-webkit-scrollbar { display: none; }
       `}</style>
+    </div>
     </div>
   );
 }

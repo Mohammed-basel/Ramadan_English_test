@@ -8,7 +8,7 @@ import {
   X,
 } from 'lucide-react';
 import { PriceChange, ProductWithPrices } from '../types';
-import { Lang } from '../lib/lang';
+import { Lang, dirFromLang } from '../lib/lang';
 import { t } from '../lib/i18n';
 
 interface KPICardsProps {
@@ -30,175 +30,8 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-/**
- * Default methodology text (Arabic) if you don't pass one from App.
- * You can replace it with your final text anytime.
- */
-const DEFAULT_METHODOLOGY = (
-  <div dir="rtl" className="text-black text-sm leading-7 text-right">
-    {/* العنوان / المصدر / الشركاء */}
-    <div className="space-y-1">
-      <p><span className="font-bold">العنوان:</span> حركة أسعار سلع أساسية مختارة خلال شهر رمضان المبارك</p>
-      <p><span className="font-bold">المصدر:</span> الجهاز المركزي للإحصاء الفلسطيني</p>
-      <p><span className="font-bold">الشركاء:</span> وزارة الاقتصاد الوطني، وجمعية حماية المستهلك الفلسطينية</p>
-    </div>
 
-    {/* الهدف */}
-    <div className="mt-4">
-      <p className="font-bold">الهدف:</p>
-      <ul className="mt-1 space-y-1 pr-6 list-disc">
-        <li>
-          تسليط الضوء على حركة أسعار بعض السلع الأساسية المختارة خلال شهر رمضان المبارك، تلك التي يزداد الإقبال عليها خلال الشهر الفضيل، بحيث تصبح ذات أثر كبير على دخل الأسر الفلسطينية، ومقارنتها بالسعر الاسترشادي الصادر عن وزارة الاقتصاد الوطني.
-        </li>
-        <li>
-          تسليط الضوء بشكل أسبوعي على حركة أسعار السلع المختارة، في الأسواق الفلسطينية، مقارنة مع السعر الاسترشادي، لقياس مستوى الالتزام بالسعر الاسترشادي، وكذلك توضيح مستوى التغيرات التي تطرأ عليها بشكل أسبوعي خلال شهر رمضان.
-        </li>
-        <li>
-          ستوفر هذه المنصة سلسلة بيانات لتلك المجموعة من السلع، على مستوى السلعة على مدار شهر رمضان المبارك.
-        </li>
-      </ul>
-    </div>
-
-    {/* معلومات عامة */}
-    <div className="mt-4 space-y-1">
-      <p><span className="font-bold">المتغيرات:</span> السعر، نسبة التغير، مدى الالتزام.</p>
-      <p><span className="font-bold">التغطية الجغرافية:</span> الضفة الغربية.</p>
-      <p><span className="font-bold">بداية الفترة:</span> الأسبوع الثاني من شهر 2-2026</p>
-      <p><span className="font-bold">نهاية الفترة:</span> الأسبوع الثالث من شهر 3-2026</p>
-    </div>
-
-    {/* المنهجية */}
-    <div className="mt-4">
-      <p className="font-bold">المنهجية:</p>
-      <ul className="mt-1 space-y-1 pr-6 list-disc">
-        <li>
-          تم اختيار 25 سلعة أساسية يزداد استهلاكها بشكل كبير خلال شهر رمضان المبارك، تتركز في الأرز، والزيت، واللحوم، والدواجن، واللبن، والجبن، والبيض، والسكر، والحلاوة، والطحينية، والقطايف، والبقوليات &quot;عدس، وحمص، وفريكة&quot;، التمور والعجوة، السميد.
-        </li>
-        <li>
-          تجمع هذه السلع من 8 محافظات رئيسية في أسواق الضفة الغربية وهي &quot;جنين، ونابلس، وقلقيلية، وطولكرم، ورام الله والبيرة، وأريحا، وبيت لحم، والخليل&quot;.
-        </li>
-        <li>
-          يتم تجميع حوالي 1650 مشاهدة سعرية بمعدل 412 تسعيرة بشكل أسبوعي لهذه السلع، لتحقيق أكبر تغطية جغرافية، تغطي تباين الأسعار لهذه السلع، في أسواق الضفة العربية.
-        </li>
-        <li>
-          تجمع من حوالي 600 منفذ بيع موزعة على مدار الفترة بين مختلف المحافظات.
-        </li>
-        <li>
-          يتم حساب معدلات الأسعار على مستوى السلعة، ومقارنة متوسط السعر بشكل أسبوع مع السعر الاسترشادي، ومع متوسط السعر للأسبوع السابق، بحيث يتم رصد التغيرات الأسبوعية لمعدلات الأسعار، ودرجة الالتزام بالأسعار الاسترشادية لتلك السلع.
-        </li>
-        <li>
-          <span className="font-bold">تحديد السعر الاسترشادي &quot;وزارة الاقتصاد&quot;:</span>
-          <ol className="mt-2 space-y-1 pr-6 list-decimal">
-            <li>تم اعتماد 25 سلعة ذات اهمية في سلة المستهلك الفلسطيني بشكل عام وفي رمضان بشكل خاص.</li>
-            <li>
-              في المرحلة الأولى يتم جمع أسعار هذه السلع من محلات البيع بالتجزئة للمستهلك، حيث يتم جمع السلع من ثلاثة مصادر (محلات تجارية صغيرة، متوسطة، كبيرة الحجم)، وتجمع الأسعار من جميع المحافظات في الضفة الغربية.
-            </li>
-            <li>
-              يتم تجميع الاسعار وفحص منطقية البيانات، بحث يتم عمل متوسط، والسعر الاعلى، والسعر الاقل، وفي حال هناك اي قيم شاذة في البيانات، يتم الرجوع والتأكد منها من الميدان.
-            </li>
-            <li>
-              في المرحلة الثانية، يتم جمع اسعار بعض السلع من كبار التجار والموزعين، من أجل ضمان عدالة السعر للمستهلك وتاجر التجزئة.
-            </li>
-          </ol>
-        </li>
-      </ul>
-    </div>
-
-    {/* مفاهيم */}
-    <div className="mt-4">
-      <p className="font-bold">مفاهيم:</p>
-      <div className="mt-1 space-y-2">
-        <p>
-          <span className="font-bold">نسبة الالتزام بالسعر الاسترشادي:</span>{' '}
-          تحسب نسبة الالتزام بمجموع عدد السلع التي تظهر تغير بأقل من 5% عند مقارنة السعر المرصود لها مع السعر الارشادي مقسوماً بالعدد الكلي للسلع وهو 25 سلعة مختارة.
-        </p>
-
-        <p>
-          <span className="font-bold">السلع الملتزمة:</span>{' '}
-          هي السلع التي تظهر تغير بأقل من 5% عند مقارنة سعرها المرصود مع السعر الاسترشادي.
-        </p>
-
-        <p>
-          <span className="font-bold">السلع غير الملتزمة:</span>{' '}
-          هي السلع التي تظهر تغير أعلى من 5% عند مقارنة سعرها المرصود مع السعر الاسترشادي.
-        </p>
-
-        <p>
-          <span className="font-bold">سلع مرتفعة أسعارها:</span>{' '}
-          تعني بأن السعر المرصود أعلى من السعر الاسترشادي ويظهر نسبة تغير إيجابية.
-        </p>
-
-        <p>
-          <span className="font-bold">سلع مستقرة أسعارها:</span>{' '}
-          تعني بأن السعر المرصود للسلعة مساوي للسعر الاسترشادي ويظهر نسبة تغير صفرية.
-        </p>
-
-        <p>
-          <span className="font-bold">سلعة منخفضة أسعارها:</span>{' '}
-          تعني بأن السعر المرصود أقل من السعر الاسترشادي ويظهر نسبة تغير سلبية.
-        </p>
-      </div>
-    </div>
-  </div>
-);
-
-
-const DEFAULT_METHODOLOGY_EN = (
-  <div dir="ltr" className="text-black text-sm leading-7 text-left">
-    <div className="space-y-1">
-      <p><span className="font-bold">Title:</span> Price Movements of Selected Basic Commodities During the Holy Month "Ramadan"</p>
-      <p><span className="font-bold">Source:</span> Palestinian Central Bureau of Statistics</p>
-      <p><span className="font-bold">Partners:</span> Ministry of National Economy, Palestinian Society for Consumer Protection</p>
-    </div>
-
-    <div className="mt-4">
-      <p className="font-bold">Objective:</p>
-      <ul className="mt-1 space-y-1 pl-6 list-disc">
-        <li>To highlight price movements of selected basic commodities during the holy month "Ramadan", those that see increased demand during this month and have a significant impact on the income of Palestinian families, and to compare these prices with the indicative price issued by the Ministry of National Economy.</li>
-        <li>To provide weekly updates on the price movements of selected commodities in Palestinian markets, compared to the indicative price, to measure the level of adherence to the indicative price and to illustrate the extent of changes occurring weekly during "Ramadan".</li>
-        <li>This platform will provide a data series for this group of commodities, at the commodity level, throughout the holy month "Ramadan".</li>
-      </ul>
-    </div>
-
-    <div className="mt-4 space-y-1">
-      <p><span className="font-bold">Variables:</span> Price, Percentage Change, Adherence to the Indicative Price.</p>
-      <p><span className="font-bold">Geographic Coverage:</span> West Bank.</p>
-      <p><span className="font-bold">Period Start Date:</span> Second week of February 2026</p>
-      <p><span className="font-bold">Period End Date:</span> Third week of March 2026</p>
-    </div>
-
-    <div className="mt-4">
-      <p className="font-bold">Methodology:</p>
-      <ul className="mt-1 space-y-1 pl-6 list-disc">
-        <li>Twenty-five essential commodities were selected, whose consumption increases significantly during the holy month "Ramadan". These include rice, oil, meat, poultry, milk, cheese, eggs, sugar, halva, tahini, qatayef, legumes (lentils, chickpeas, and freekeh), dates, and semolina.</li>
-        <li>These commodities were collected from eight major governorates in the West Bank: Jenin, Nablus, Qalqilya, Tulkarm, Ramallah and Al-Bireh, Jericho, Bethlehem, and Hebron.</li>
-        <li>Approximately 1,650 price observations, averaging 412 price quotes per week, were collected to achieve the broadest possible geographical coverage.</li>
-        <li>Data was collected from approximately 600 retail outlets distributed across the various governorates.</li>
-        <li>Price rates are calculated at the commodity level, and the average price is compared weekly with the indicative price and the previous week's average, tracking weekly changes in price rates and the degree of compliance with indicative prices.</li>
-        <li><span className="font-bold">Determining the Indicative Price (Ministry of Economy):</span>
-          <ol className="mt-2 space-y-1 pl-6 list-decimal">
-            <li>Twenty-five essential commodities were selected, particularly those consumed during Ramadan.</li>
-            <li>In the first phase, prices were collected from retail outlets — small, medium, and large — across all West Bank governorates.</li>
-            <li>Prices were compiled and checked for logical consistency. An average, highest, and lowest price were calculated; any anomalies were verified in the field.</li>
-            <li>In the second phase, prices for some commodities were collected from major wholesalers and distributors to ensure fair pricing for consumers and retailers.</li>
-          </ol>
-        </li>
-      </ul>
-    </div>
-
-    <div className="mt-4">
-      <p className="font-bold">Concepts:</p>
-      <div className="mt-1 space-y-2">
-        <p><span className="font-bold">Rate of compliance with the indicative price:</span> Calculated as the number of commodities showing less than 5% change compared to the indicative price, divided by the total number of selected commodities (25).</p>
-        <p><span className="font-bold">Compliant goods:</span> Goods showing less than 5% change compared to the indicative price.</p>
-        <p><span className="font-bold">Non-compliant goods:</span> Goods showing more than 5% change compared to the indicative price.</p>
-        <p><span className="font-bold">Highly priced goods:</span> The observed price is higher than the indicative price (positive percentage change).</p>
-        <p><span className="font-bold">Stable priced goods:</span> The observed price equals the indicative price (zero percentage change).</p>
-        <p><span className="font-bold">Underpriced goods:</span> The observed price is lower than the indicative price (negative percentage change).</p>
-      </div>
-    </div>
-  </div>
-);
+export function KPICards({
   lang,
   maxIncrease,
   maxDecrease,
@@ -207,6 +40,9 @@ const DEFAULT_METHODOLOGY_EN = (
   adherencePercent,
   methodologyText,
 }: KPICardsProps) {
+  const dir = dirFromLang(lang);
+  const align = dir === 'rtl' ? 'text-right' : 'text-left';
+
   const [openMethodology, setOpenMethodology] = useState(false);
 
 const computedAdherence = useMemo(() => {
@@ -236,7 +72,7 @@ const adherenceLevel = adherence >= 70 ? 'good' : adherence >= 40 ? 'warn' : 'ba
           text: 'text-green-700',
           value: 'text-green-700',
           icon: <CheckCircle2 className="text-green-600" width={34} height={34} />,
-          hint: lang === 'en' ? 'High level of commitment' : 'مستوى التزام مرتفع',
+          hint: 'مستوى التزام مرتفع',
         }
       : adherenceLevel === 'warn'
       ? {
@@ -244,17 +80,17 @@ const adherenceLevel = adherence >= 70 ? 'good' : adherence >= 40 ? 'warn' : 'ba
           text: 'text-amber-800',
           value: 'text-amber-800',
           icon: <AlertTriangle className="text-amber-600" width={34} height={34} />,
-          hint: lang === 'en' ? 'Needs monitoring' : 'يحتاج متابعة',
+          hint: 'يحتاج متابعة',
         }
       : {
           ring: 'bg-red-100',
           text: 'text-red-700',
           value: 'text-red-700',
           icon: <AlertTriangle className="text-red-600" width={34} height={34} />,
-          hint: lang === 'en' ? 'Low level of commitment' : 'مستوى التزام منخفض',
+          hint: 'مستوى التزام منخفض',
         };
 
-const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN : DEFAULT_METHODOLOGY);
+const methodContent = methodologyText ?? DEFAULT_METHODOLOGY;
 
   // If increase/decrease not ready, still show the other two cards.
   return (
@@ -265,9 +101,9 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
       {adherenceStyles.icon}
     </div>
 
-    <div className={`text-right flex-1 min-w-0`} style={{ textAlign: lang === 'en' ? 'left' : 'right' }}>
+    <div className={`${align} flex-1 min-w-0`}>
       <h3 className="text-gray-700 font-bold text-base mb-1">
-        {lang === 'en' ? 'Rate of compliance with the indicative price' : 'نسبة الالتزام بالسعر الاسترشادي'}
+        نسبة الالتزام بالسعر الاسترشادي
       </h3>
 
       <div className="flex items-end justify-between gap-3">
@@ -301,7 +137,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
       </div>
 
       <p className="text-xs text-gray-500 mt-2">
-        {lang === 'en' ? `Week ${currentWeek}` : `الأسبوع ${currentWeek}`}
+        الأسبوع {currentWeek}
       </p>
     </div>
   </div>
@@ -312,7 +148,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
           <div className="bg-red-100 rounded-full p-4 flex-shrink-0">
             <TrendingUp className="text-red-600" width={32} height={32} />
           </div>
-          <div className="flex-1 min-w-0" style={{ textAlign: lang === 'en' ? 'left' : 'right' }}>
+          <div className={`${align} flex-1 min-w-0`}>
             <h3 className="text-gray-700 font-bold text-base mb-1">{t('kpiMaxIncrease', lang)}</h3>
             <p className="text-lg font-bold text-red-600 mb-1 truncate">
               {maxIncrease?.product?.name ?? '—'}
@@ -320,7 +156,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
             <p className="text-2xl font-black text-red-600">
               {maxIncrease ? formatSignedPercent(maxIncrease.percent, 2) : '—'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – Week ${currentWeek}` : `عن الاسترشادي - أسبوع ${currentWeek}`}</p>
+            <p className="text-xs text-gray-500 mt-1">عن الاسترشادي - أسبوع {currentWeek}</p>
           </div>
         </div>
 
@@ -329,7 +165,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
           <div className="bg-green-100 rounded-full p-4 flex-shrink-0">
             <TrendingDown className="text-green-600" width={32} height={32} />
           </div>
-          <div className="flex-1 min-w-0" style={{ textAlign: lang === 'en' ? 'left' : 'right' }}>
+          <div className={`${align} flex-1 min-w-0`}>
             <h3 className="text-gray-700 font-bold text-base mb-1">{t('kpiMaxDecrease', lang)}</h3>
             <p className="text-lg font-bold text-green-600 mb-1 truncate">
               {maxDecrease?.product?.name ?? '—'}
@@ -337,7 +173,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
             <p className="text-2xl font-black text-green-600">
               {maxDecrease ? formatSignedPercent(maxDecrease.percent, 2) : '—'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – Week ${currentWeek}` : `عن الاسترشادي - أسبوع ${currentWeek}`}</p>
+            <p className="text-xs text-gray-500 mt-1">عن الاسترشادي - أسبوع {currentWeek}</p>
           </div>
         </div>
 
@@ -348,11 +184,12 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
           <div className="bg-blue-100 rounded-full p-4 flex-shrink-0">
             <Info className="text-blue-700" width={32} height={32} />
           </div>
-          <div className="flex-1 min-w-0" style={{ textAlign: lang === 'en' ? 'left' : 'right' }}>
+          <div className={`${align} flex-1 min-w-0`}>
             <h3 className="text-gray-700 font-bold text-base mb-2">{t('methodologyTitle', lang)}</h3>
             <p className="text-xs text-gray-600 leading-relaxed line-clamp-2 mb-3">
               {t('methodologyHint', lang)}
             </p>
+
 
             <button
               type="button"
@@ -360,7 +197,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition"
             >
               <Info className="w-4 h-4" />
-              {lang === 'en' ? 'View Details' : 'عرض التفاصيل'}
+              عرض التفاصيل
             </button>
           </div>
         </div>
@@ -400,7 +237,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
                 onClick={() => setOpenMethodology(false)}
                 className="px-5 py-2 rounded-lg bg-gray-800 hover:bg-black text-white font-bold transition"
               >
-                {lang === 'en' ? 'Close' : 'إغلاق'}
+                إغلاق
               </button>
             </div>
           </div>
