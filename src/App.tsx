@@ -26,6 +26,7 @@ function App() {
 
   const lang: Lang = useMemo(() => getLangFromUrl(), []);
   const dir = useMemo(() => dirFromLang(lang), [lang]);
+  const dir = useMemo(() => dirFromLang(lang), [lang]);
 
   // Mobile UX: after selecting from dropdown, auto-scroll to chart after a short delay (small screens only)
   const chartScrollTimerRef = useRef<number | null>(null);
@@ -89,11 +90,21 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
     const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, { attributes: true, childList: true, subtree: true });
 
-    return () => {
+    return (
+    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+) => {
       window.removeEventListener('resize', sendHeight);
       observer.disconnect();
     };
   }, []);
+
+  // Apply language + direction to the whole document
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = dir;
+    // Also set on body for safety in some embed/iframe cases
+    document.body.setAttribute('dir', dir);
+  }, [lang, dir]);
 
   const useSampleData = () => {
     const sorted = [...sampleProducts].sort((a, b) => sortArabic(a.name, b.name));
@@ -246,17 +257,29 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
   }, [allPriceChanges]);
 
   const exportToExcel = async () => {
-    const headers = [
-      'المنتج',
-      'الأسبوع',
-      'السعر الأسبوعي',
-      'السعر الاسترشادي',
-      'التغيّر عن الاسترشادي %',
-      'التغيّر عن الاسترشادي (NIS)',
-      'السعر للأسبوع السابق',
-      'التغيّر عن الأسبوع السابق %',
-      'التغيّر عن الأسبوع السابق (NIS)',
-    ];
+    const headers = lang === 'en'
+    ? [
+        'Commodity',
+        'Week',
+        'Weekly price',
+        'Indicative price',
+        'Change vs indicative %',
+        'Change vs indicative (NIS)',
+        'Previous week price',
+        'Change vs previous week %',
+        'Change vs previous week (NIS)',
+      ]
+    : [
+        'المنتج',
+        'الأسبوع',
+        'السعر الأسبوعي',
+        'السعر الاسترشادي',
+        'التغيّر عن الاسترشادي %',
+        'التغيّر عن الاسترشادي (NIS)',
+        'السعر للأسبوع السابق',
+        'التغيّر عن الأسبوع السابق %',
+        'التغيّر عن الأسبوع السابق (NIS)',
+      ];
 
     const rows = filteredProducts.map((product) => {
       const weekPrice = product.prices.find((p) => p.week_number === currentWeek)?.price ?? 0;
@@ -309,16 +332,20 @@ URL.revokeObjectURL(url);
 
   if (loading) {
     return (
+    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center" dir="rtl">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4" />
-          <p className="text-xl font-bold text-gray-700">جاري التحميل...</p>
+          <p className="text-xl font-bold text-gray-700">{lang === 'en' ? 'Loading…' : 'جاري التحميل...'}</p>
         </div>
       </div>
     );
   }
 
   return (
+    <div dir={dir} className={dir === 'rtl' ? 'text-right' : 'text-left'}>
+
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50" dir="rtl">
       <div className="max-w-[1800px] mx-auto p-6">
         <header className="text-center mb-8">
@@ -355,7 +382,7 @@ URL.revokeObjectURL(url);
 
         {usingSampleData && (
           <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            يتم عرض بيانات تجريبية. لعرض البيانات الحقيقية ضع ملفات CSV داخل مجلد <span className="font-bold">/data/</span> على الخادم (products.csv و weekly_prices.csv).
+            {lang === 'en' ? <>Showing sample data. To use real data, place CSV files in <span className="font-bold">/data/</span> on the server (products.csv and weekly_prices.csv).</> : <>يتم عرض بيانات تجريبية. لعرض البيانات الحقيقية ضع ملفات CSV داخل مجلد <span className="font-bold">/data/</span> على الخادم (products.csv و weekly_prices.csv).</>}
           </div>
         )}
 
@@ -369,6 +396,7 @@ URL.revokeObjectURL(url);
         adherencePercent={manualAdherence}
       />
         <ProductTicker
+          lang={lang}
           products={products}
           currentWeek={currentWeek}
           selectedId={selectedId}
@@ -377,7 +405,7 @@ URL.revokeObjectURL(url);
         <div className="bg-white rounded-xl shadow-lg p-5 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
             <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700 mb-2">اختيار السلعة</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{lang === 'en' ? 'Select commodity' : 'اختيار السلعة'}</label>
               <select
                 value={selectedId ?? ALL_VALUE}
                 onChange={(e) => {
@@ -387,7 +415,7 @@ URL.revokeObjectURL(url);
                 }}
                 className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-600 focus:outline-none transition-colors"
               >
-                <option value={ALL_VALUE}>الكل</option>
+                <option value={ALL_VALUE}>{lang === 'en' ? 'All' : 'الكل'}</option>
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -397,7 +425,7 @@ URL.revokeObjectURL(url);
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700 mb-2">تغير السعر</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{lang === 'en' ? 'Price change' : 'تغير السعر'}</label>
               <div className="flex gap-2">
                 <Filter className="text-gray-400 w-5 h-5 self-center" />
                 <select
@@ -408,16 +436,16 @@ URL.revokeObjectURL(url);
                     selectedId !== null ? 'opacity-50 cursor-not-allowed' : 'focus:border-blue-600'
                   }`}
                 >
-                  <option value="all">الكل</option>
-                  <option value="increase">ارتفاع الأسعار</option>
-                  <option value="decrease">انخفاض الأسعار</option>
-                  <option value="stable">مستقرة</option>
+                  <option value="all">{lang === 'en' ? 'All' : 'الكل'}</option>
+                  <option value="increase">{lang === 'en' ? 'Increase' : 'ارتفاع الأسعار'}</option>
+                  <option value="decrease">{lang === 'en' ? 'Decrease' : 'انخفاض الأسعار'}</option>
+                  <option value="stable">{lang === 'en' ? 'Stable' : 'مستقرة'}</option>
                 </select>
               </div>
             </div>
 
             <div className="w-full md:w-[220px]">
-              <label className="block text-sm font-bold text-gray-700 mb-2">الأسبوع</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2">{lang === 'en' ? 'Week' : 'الأسبوع'}</label>
               <select
                 value={currentWeek}
                 onChange={(e) => setCurrentWeek(Number(e.target.value))}
@@ -436,12 +464,12 @@ URL.revokeObjectURL(url);
               className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
             >
               <Download className="w-5 h-5" />
-              تصدير Excel
+              {lang === 'en' ? 'Export Excel' : 'تصدير Excel'}
             </button>
           </div>
 
 <div className="mt-3 text-sm text-gray-600 flex items-center gap-2 whitespace-nowrap leading-none">
-  <span className="font-semibold">عدد السلع:</span>
+  <span className="font-semibold">{lang === 'en' ? 'Number of commodities:' : 'عدد السلع:'}</span>
   <span className="font-bold text-blue-600">{filteredProducts.length}</span>
 
   <span className="mx-2 text-gray-300">|</span>
@@ -485,15 +513,15 @@ URL.revokeObjectURL(url);
               <PriceChart language={lang}  products={[selectedProduct]} currentWeek={currentWeek} />
             ) : (
               <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                <p className="text-xl text-gray-500 font-semibold">اختر سلعة من القائمة لعرض الرسم البياني</p>
+                <p className="text-xl text-gray-500 font-semibold">{lang === 'en' ? 'Select a commodity from the list to view the chart' : 'اختر سلعة من القائمة لعرض الرسم البياني'}</p>
               </div>
             )}
           </div>
         </div>
                 {/* Weekly updates + official contact */}
         <div className="mt-5 space-y-3">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-right text-sm leading-6">
-            رقم وزارة الاقتصاد الوطني لتقديم الشكاوى:
+          <div className={`bg-blue-50 border border-blue-200 rounded-xl p-3 ${dir === 'rtl' ? 'text-right' : 'text-left'} text-sm leading-6`}>
+            {lang === 'en' ? 'Ministry of National Economy complaints number:' : 'رقم وزارة الاقتصاد الوطني لتقديم الشكاوى:'}
             <span className="font-black mr-2">129</span>
           </div>
         </div>
