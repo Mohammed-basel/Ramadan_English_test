@@ -17,6 +17,7 @@ import { Chart } from 'react-chartjs-2';
 import { Download } from 'lucide-react';
 import { ProductWithPrices } from '../types';
 import { formatWeekLabel } from '../lib/weekLabels';
+import { Lang } from '../lib/lang';
 
 ChartJS.register(
   CategoryScale,
@@ -35,6 +36,7 @@ type ViewMode = 'all' | 'price' | 'change';
 interface PriceChartProps {
   products: ProductWithPrices[];
   currentWeek?: number;
+  language?: Lang;
 }
 
 // 1. Plugin to draw the Reference Line across the entire width (works for 1 point)
@@ -73,7 +75,7 @@ const whiteBackgroundPlugin: Plugin = {
   },
 };
 
-export function PriceChart({ products, currentWeek = 1 }: PriceChartProps) {
+export function PriceChart({ products, currentWeek = 1, language = 'ar' }: PriceChartProps) {
   const product = products[0];
   const [viewMode, setViewMode] = useState<ViewMode>('all');
   const chartRef = useRef<any>(null);
@@ -329,7 +331,8 @@ export function PriceChart({ products, currentWeek = 1 }: PriceChartProps) {
 </strong>
         </span>
         <span>
-          {language === 'en' ? 'Displayed week:' : 'الأسبوع المعروض:'} <strong className="text-blue-600">الأسبوع {currentWeek}</strong>
+          {language === 'en' ? 'Displayed week:' : 'الأسبوع المعروض:'}{' '}
+          <strong className="text-blue-600">{formatWeekLabel(currentWeek, language)}</strong>
         </span>
       </div>
     </div>

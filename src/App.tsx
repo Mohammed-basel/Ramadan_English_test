@@ -487,6 +487,7 @@ URL.revokeObjectURL(url);
                     isHighestIncrease={maxIncrease?.product.id === product.id}
                     isLowestDecrease={maxDecrease?.product.id === product.id}
                     currentWeek={currentWeek}
+                    lang={lang}
                   />
                 </div>
               ))}

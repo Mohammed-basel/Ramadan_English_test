@@ -13,6 +13,7 @@ interface ProductCardProps {
   isHighestIncrease?: boolean;
   isLowestDecrease?: boolean;
   currentWeek: number;
+  lang: Lang;
 }
 
 function formatSignedPercent(v: number, decimals = 1) {
@@ -68,6 +69,7 @@ export function ProductCard({
   isHighestIncrease,
   isLowestDecrease,
   currentWeek,
+  lang,
 }: ProductCardProps) {
   const weekPrice = Number(product.prices?.find((p: any) => p.week_number === currentWeek)?.price ?? 0);
   const prevPrice =
@@ -87,6 +89,8 @@ export function ProductCard({
 
   const iconValue = getProductIcon(product);
   const colorValue = getProductColor(product);
+
+  const dir = dirFromLang(lang);
 
   const baseUrl = import.meta.env.BASE_URL || '/';
   const iconUrl = pickIconUrl(baseUrl, product.id);
