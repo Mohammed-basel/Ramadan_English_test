@@ -88,10 +88,12 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
   const tooltipTitleSize = isMobile ? 12 : 14;
   const tooltipBodySize = isMobile ? 11 : 13;
 
-  const titleText = 'نسب التغيّر ومستويات الأسعار أسبوعيا للسلع الأساسية خلال شهر رمضان مقارنة بالأسعار الاسترشادية';
-  const barLabel = 'السعر الأسبوعي';
-  const lineLabel = 'التغيّر % عن الاسترشادي';
-  const refLabel = 'السعر الاسترشادي';
+  const titleText = language === 'en'
+    ? 'Rates of change and weekly price levels for basic commodities during Ramadan compared to indicative prices'
+    : 'نسب التغيّر ومستويات الأسعار أسبوعيا للسلع الأساسية خلال شهر رمضان مقارنة بالأسعار الاسترشادية';
+  const barLabel = language === 'en' ? 'Weekly price' : 'السعر الأسبوعي';
+  const lineLabel = language === 'en' ? '% change vs. indicative' : 'التغيّر % عن الاسترشادي';
+  const refLabel = language === 'en' ? 'Indicative price' : 'السعر الاسترشادي';
   const refChange = '#000000';
   const axisColor = '#334155';
 
@@ -184,7 +186,7 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
       legend: {
         display: true,
         position: 'top',
-        rtl: true,
+        rtl: language !== 'en',
         labels: {
           font: { size: legendFontSize, weight: 'bold' },
           padding: isMobile ? 10 : 16,
@@ -208,7 +210,7 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
         },
       },
       tooltip: {
-        rtl: true,
+        rtl: language !== 'en',
         backgroundColor: 'rgba(15,23,42,0.9)',
         titleFont: { size: tooltipTitleSize, weight: 'bold' },
         bodyFont: { size: tooltipBodySize },
@@ -237,7 +239,7 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
         max: yBarLimits.max,
         title: {
           display: true,
-          text: 'السعر (NIS)',
+          text: language === 'en' ? 'Price (NIS)' : 'السعر (NIS)',
           font: { size: axisTitleFontSize, weight: 'bold' },
         },
         grid: { color: 'rgba(0,0,0,0.06)' },
@@ -250,7 +252,7 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
         max: yLineLimits.max,
         title: {
           display: true,
-          text: 'نسبة التغيّر %',
+          text: language === 'en' ? '% Change' : 'نسبة التغيّر %',
           font: { size: axisTitleFontSize, weight: 'bold' },
           color: axisColor,
         },
@@ -281,7 +283,9 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <div className="flex justify-center gap-2">
           {(['all', 'price', 'change'] as const).map((mode) => {
-            const labelsMap = { all: 'الكل', price: 'السعر', change: 'التغيّر' };
+          const labelsMap = language === 'en'
+            ? { all: 'All', price: 'Price', change: 'Change' }
+            : { all: 'الكل', price: 'السعر', change: 'التغيّر' };
             const active = viewMode === mode;
             return (
               <button
@@ -299,7 +303,7 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
         <div className="flex justify-center">
           <button onClick={downloadChart} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-bold text-xs sm:text-sm">
             <Download className="w-4 h-4" />
-            تنزيل الرسم
+            {language === 'en' ? 'Download chart' : 'تنزيل الرسم'}
           </button>
         </div>
       </div>
@@ -321,14 +325,17 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
 
       <div className="flex justify-center gap-6 pt-2 border-t border-gray-100 text-xs sm:text-sm text-gray-600">
         <span>
-السعر الاسترشادي:{' '}
-<strong className="inline-flex items-baseline text-gray-800 tabular-nums" dir="ltr">
-  <span>{ref.toFixed(2)}</span>
-  <span className="ml-[2px] text-[11px] font-semibold">NIS</span>
-</strong>
+          {language === 'en' ? 'Indicative price:' : 'السعر الاسترشادي:'}{' '}
+          <strong className="inline-flex items-baseline text-gray-800 tabular-nums" dir="ltr">
+            <span>{ref.toFixed(2)}</span>
+            <span className="ml-[2px] text-[11px] font-semibold">NIS</span>
+          </strong>
         </span>
         <span>
-          الأسبوع المعروض: <strong className="text-blue-600">الأسبوع {currentWeek}</strong>
+          {language === 'en'
+            ? <><strong className="text-blue-600">Week {currentWeek}</strong></>
+            : <>الأسبوع المعروض: <strong className="text-blue-600">الأسبوع {currentWeek}</strong></>
+          }
         </span>
       </div>
     </div>
