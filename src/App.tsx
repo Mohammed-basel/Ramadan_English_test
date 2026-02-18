@@ -154,6 +154,12 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
     setHasUserSelected(true);
     setSelectedId(id);
 
+    // If the user picks a specific commodity from the dropdown, price-change filtering should be reset.
+    // (Price-change filter is intended for the 'All commodities' list.)
+    if (source === 'dropdown' && id !== null) {
+      setFilterType('all');
+    }
+
     // Cancel any pending chart auto-scroll when selection changes.
     if (chartScrollTimerRef.current) {
       window.clearTimeout(chartScrollTimerRef.current);
@@ -174,17 +180,6 @@ const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
       }
     }
   };
-
-
-  // When a single product is selected, list-level filtering becomes meaningless.
-  // Keep the control visible but disabled (and reset to 'all').
-  useEffect(() => {
-    if (selectedId !== null) {
-      setFilterType('all');
-    }
-  }, [selectedId]);
-
-
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
