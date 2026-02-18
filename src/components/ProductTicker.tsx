@@ -142,7 +142,7 @@ export function ProductTicker({
   return (
     <div className="bg-white rounded-xl shadow-lg p-5 mb-6" dir={dir} >
       {/* Header */}
-      <div className={`flex items-center ${lang === 'en' ? 'flex-row' : 'flex-row-reverse'} justify-between`}>
+      <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg px-3 py-1">
           {lang === 'en' ? `Average prices – Week ${currentWeek}` : `متوسط أسعار الأسبوع ${currentWeek}`}
           {weekDateIso && (
