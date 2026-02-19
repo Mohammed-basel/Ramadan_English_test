@@ -3,7 +3,6 @@ import { ArrowDown, ArrowUp, Download, Filter } from 'lucide-react';
 import { ProductCard } from './components/ProductCard';
 import { PriceChart } from './components/PriceChart';
 import { KPICards } from './components/KPICards';
-import { ComplaintsPill } from './components/ComplaintsPill';
 import { ProductTicker } from './components/ProductTicker';
 import { sampleProducts } from './data/sampleProducts';
 import { loadDataFromCSV } from './lib/csvLoader';
@@ -344,6 +343,12 @@ URL.revokeObjectURL(url);
               </p>
               </div>
             </div>
+          <div className={`bg-blue-50 border border-blue-200 rounded-xl p-3 ${lang === 'en' ? 'text-left' : 'text-right'} text-sm leading-6`}>
+            {lang === 'en'
+              ? <>Ministry of National Economy complaints number: <span className="font-black ml-2">129</span></>
+              : <>رقم وزارة الاقتصاد الوطني لتقديم الشكاوى: <span className="font-black mr-2">129</span></>
+            }
+          </div>
         </header>
 
         {usingSampleData && (
@@ -364,9 +369,6 @@ URL.revokeObjectURL(url);
         maxDecrease={maxDecrease}
         adherencePercent={manualAdherence}
       />
-
-      <ComplaintsPill lang={lang} phone="129" />
-
         <ProductTicker
           lang={lang}
           products={products}
