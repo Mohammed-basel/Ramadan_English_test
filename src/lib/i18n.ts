@@ -3,7 +3,7 @@ import { Lang } from './lang';
 export const STRINGS = {
   headerTitle: {
     ar: "منصة رصد أسعار أهم السلع الأساسية خلال شهر رمضان المبارك",
-    en: "A platform for monitoring the prices of important basic commodities during the holy month “Ramadan”",
+    en: "Price dashboard for essential commodities during the holy month “Ramadan”",
   },
   headerSubtitle: {
     ar: "متابعة وتحليل أسعار السلع الاستهلاكية المختارة خلال شهر رمضان",
