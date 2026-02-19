@@ -22,8 +22,8 @@ export const STRINGS = {
     en: "Ministry of National Economy Complaints Number: 129",
   },
   kpiComplianceTitle: {
-    ar: "نسبة الالتزام بالسعر الاسترشادي",
-    en: "Rate of compliance with the indicative price",
+    ar: "بالسعر الاسترشادي",
+    en: "indicative price",
   },
   kpiLowCompliance: {
     ar: "مستوى التزام منخفض",
