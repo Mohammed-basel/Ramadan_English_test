@@ -34,29 +34,9 @@ interface CSVPrice {
   week_date?: string;
 }
 
-const NAME_OVERRIDES: Record<string, string> = {
-  '11100103': 'أرز حبة قصيرة',
-  '11100107': 'أرز حبة طويلة',
-  '11100301': 'خبز كماج',
-  '11210102': 'لحم عجل طازج',
-  '11210201': 'لحم عجل مجمد',
-  '11220102': 'دجاج منظف',
-  '11420303': 'جبنة غنم بيضاء',
-  '11430001': 'بيض دجاج',
-  '11510203': 'زيت الذرة',
-  '11510204': 'زيت عباد الشمس',
-  '11520101': 'سمنة نباتية',
-  '11800105': 'سكر',
-  '11800202': 'حلاوة',
-  '11930206': 'طحينية',
-  '11100604': 'قطايف',
-  '11101301': 'فريكة',
-  '11740201': 'عدس مجروش',
-  '11740302': 'حمص حب',
-  '11210107': 'لحم خروف طازج',
-  '11210203': 'لحم خروف مجمد',
-  '11420105': 'لبن رايب',
-};
+// NOTE:
+// Keep product names sourced from the data file (products.csv) as the single source of truth.
+// This avoids mismatches where the UI shows an old hardcoded name even after the CSV is corrected.
 
 function normalizeId(v: any): string {
   return String(v ?? '').replace(/^0+/, '');
@@ -191,7 +171,9 @@ export async function loadDataFromCSV(lang: Lang = 'ar'): Promise<ProductWithPri
       return {
         ...p,
         id,
-        name: lang === 'en' ? String((p as any).Item ?? '') : (NAME_OVERRIDES[id] ?? String((p as any).name ?? '')),
+        // Arabic name comes directly from the CSV `name` column.
+        // English name comes from the CSV `Item` column (your EN products file).
+        name: lang === 'en' ? String((p as any).Item ?? '') : String((p as any).name ?? ''),
         icon: String(p.icon ?? ''),
         color: String(p.color ?? ''),
         weight: (lang === 'en' ? ((p as any).Unit ? String((p as any).Unit) : undefined) : (p.weight ? String(p.weight) : undefined)),
