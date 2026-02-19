@@ -22,7 +22,7 @@ export const STRINGS = {
     en: "Ministry of National Economy Complaints Number: 129",
   },
   kpiComplianceTitle: {
-    ar: "بالسعر الاسترشادي",
+    ar: "السعر الاسترشادي",
     en: "indicative price",
   },
   kpiLowCompliance: {
