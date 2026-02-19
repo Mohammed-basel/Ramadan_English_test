@@ -364,6 +364,7 @@ URL.revokeObjectURL(url);
         adherencePercent={manualAdherence}
       />
                   <div className={`bg-blue-50 border border-blue-200 rounded-xl p-3 ${lang === 'en' ? 'text-left' : 'text-right'} text-sm leading-6`}>
+                    <i class="fa-solid fa-phone"></i>
             {lang === 'en'
               ? <>Ministry of National Economy complaints number: <span className="font-black ml-2">129</span></>
               : <>رقم وزارة الاقتصاد الوطني لتقديم الشكاوى: <span className="font-black mr-2">129</span></>
