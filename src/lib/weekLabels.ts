@@ -137,7 +137,9 @@ export function getWeekDateRangeLabel(weekNumber: number, language: Language): s
 }
 
 export function formatWeekLabel(weekNumber: number, language: Language, weekDate?: string): string {
-  const base = language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`;
+  const base = weekNumber === 3
+    ? (language === 'ar' ? 'الأسبوع الأول من رمضان' : 'Week 1 Ramadan')
+    : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
 
   const explicit = normalizeWeekDateText(weekDate || '', language);
   if (explicit) return `${base} (${explicit})`;
