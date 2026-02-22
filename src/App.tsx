@@ -334,11 +334,11 @@ URL.revokeObjectURL(url);
               <p className="font-semibold">
                 {lang === 'en' ? (
                   <>
-                    <span className="text-gray-700">Next Update:</span> Monday, 23/2/2026 at 10:00 AM
+                    <span className="text-gray-700">Next Update:</span> Monday, 3/2/2026 at 10:00 AM
                   </>
                 ) : (
                   <>
-                    <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/2/2026 الساعة 10:00 صباحًا
+                    <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 2/3/2026 الساعة 10:00 صباحًا
                   </>
                 )}
               </p>

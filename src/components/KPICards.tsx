@@ -10,6 +10,7 @@ import {
 import { PriceChange, ProductWithPrices } from '../types';
 import { Lang } from '../lib/lang';
 import { t } from '../lib/i18n';
+import { formatWeekLabel } from '../lib/weekLabels';
 
 interface KPICardsProps {
   lang: Lang;
@@ -209,6 +210,9 @@ export function KPICards({
   adherencePercent,
   methodologyText,
 }: KPICardsProps) {
+  const anyProduct = products?.[0];
+  const currentWeekDate = anyProduct?.prices?.find((p) => p.week_number === currentWeek)?.week_date;
+  const weekLabel = formatWeekLabel(currentWeek, lang, currentWeekDate);
   const [openMethodology, setOpenMethodology] = useState(false);
 
 const computedAdherence = useMemo(() => {
@@ -303,7 +307,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
       </div>
 
       <p className="text-xs text-gray-500 mt-2">
-        {lang === 'en' ? `Week ${currentWeek}` : `الأسبوع ${currentWeek}`}
+        {weekLabel}
       </p>
     </div>
   </div>
@@ -322,7 +326,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
             <p className="text-2xl font-black text-red-600">
               {maxIncrease ? formatSignedPercent(maxIncrease.percent, 2) : '—'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – Week ${currentWeek}` : `عن الاسترشادي - أسبوع ${currentWeek}`}</p>
+            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – ${weekLabel}` : `عن الاسترشادي - ${weekLabel}`}</p>
           </div>
         </div>
 
@@ -339,7 +343,7 @@ const methodContent = methodologyText ?? (lang === 'en' ? DEFAULT_METHODOLOGY_EN
             <p className="text-2xl font-black text-green-600">
               {maxDecrease ? formatSignedPercent(maxDecrease.percent, 2) : '—'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – Week ${currentWeek}` : `عن الاسترشادي - أسبوع ${currentWeek}`}</p>
+            <p className="text-xs text-gray-500 mt-1">{lang === 'en' ? `vs. indicative – ${weekLabel}` : `عن الاسترشادي - ${weekLabel}`}</p>
           </div>
         </div>
 

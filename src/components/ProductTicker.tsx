@@ -144,7 +144,10 @@ export function ProductTicker({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg px-3 py-1">
-          {lang === 'en' ? `Average prices – Week ${currentWeek}` : `متوسط أسعار الأسبوع ${currentWeek}`}
+          {lang === 'en'
+            ? (currentWeek === 3 ? 'Average prices – Week 1 Ramadan' : 'Average prices')
+            : (currentWeek === 3 ? 'متوسط أسعار الأسبوع الأول من رمضان' : 'متوسط أسعار')
+          }
           {weekDateIso && (
             <span className="text-gray-500 font-medium whitespace-nowrap tabular-nums" dir="ltr">
               {' '}({formatWeekDate(weekDateIso)})

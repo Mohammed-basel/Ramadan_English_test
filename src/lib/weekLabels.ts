@@ -137,13 +137,21 @@ export function getWeekDateRangeLabel(weekNumber: number, language: Language): s
 }
 
 export function formatWeekLabel(weekNumber: number, language: Language, weekDate?: string): string {
-  const base = weekNumber === 3
-    ? (language === 'ar' ? 'الأسبوع الأول من رمضان' : 'Week 1 Ramadan')
-    : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
-
+  // Week 1 & 2: show ONLY the date range (no “Week 1/2” prefix).
   const explicit = normalizeWeekDateText(weekDate || '', language);
-  if (explicit) return `${base} (${explicit})`;
-
   const range = getWeekDateRangeLabel(weekNumber, language);
-  return range ? `${base} (${range})` : base;
+  const dateOnly = explicit || range;
+
+  if (weekNumber === 1 || weekNumber === 2) {
+    return dateOnly ? `${dateOnly}` : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
+  }
+
+  // Week 3: rename to “Week 1 Ramadan / الأسبوع الأول من رمضان”
+  const base =
+    weekNumber === 3
+      ? (language === 'ar' ? 'الأسبوع الأول من رمضان' : 'Week 1 Ramadan')
+      : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
+
+  if (dateOnly) return `${base} (${dateOnly})`;
+  return base;
 }

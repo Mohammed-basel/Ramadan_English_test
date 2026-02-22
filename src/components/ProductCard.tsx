@@ -3,6 +3,7 @@ import { AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 import { ProductWithPrices } from '../types';
 import { Lang } from '../lib/lang';
 import { t } from '../lib/i18n';
+import { formatWeekLabel } from '../lib/weekLabels';
 import { getProductColor, getProductIcon } from '../lib/productMeta';
 
 interface ProductCardProps {
@@ -71,6 +72,8 @@ export function ProductCard({
   isLowestDecrease,
   currentWeek,
 }: ProductCardProps) {
+  const currentWeekDate = product?.prices?.find((p) => p.week_number === currentWeek)?.week_date;
+  const weekLabel = formatWeekLabel(currentWeek, lang, currentWeekDate);
   const weekPrice = Number(product.prices?.find((p: any) => p.week_number === currentWeek)?.price ?? 0);
   const prevPrice =
     currentWeek > 1
@@ -222,7 +225,7 @@ export function ProductCard({
           <span className="font-semibold">{t('kpiComplianceTitle', lang)}: </span>
           <span className="font-bold">NIS {refPrice.toFixed(2)}</span>
         </div>
-        <div className="text-gray-500">{lang === 'en' ? `Week ${currentWeek}` : `الأسبوع ${currentWeek}`}</div>
+        <div className="text-gray-500">{weekLabel}</div>
       </div>
     </button>
   );

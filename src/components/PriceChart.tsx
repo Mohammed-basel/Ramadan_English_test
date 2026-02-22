@@ -78,6 +78,8 @@ const whiteBackgroundPlugin: Plugin = {
 
 export function PriceChart({ products, currentWeek = 1, language = 'ar' }: PriceChartProps) {
   const product = products[0];
+  const currentWeekDate = product?.prices?.find((p) => p.week_number === currentWeek)?.week_date;
+  const currentWeekLabel = formatWeekLabel(currentWeek, language, currentWeekDate);
   const [viewMode, setViewMode] = useState<ViewMode>('all');
   const chartRef = useRef<any>(null);
 
@@ -333,8 +335,8 @@ export function PriceChart({ products, currentWeek = 1, language = 'ar' }: Price
         </span>
         <span>
           {language === 'en'
-            ? <><strong className="text-blue-600">Week {currentWeek}</strong></>
-            : <>الأسبوع المعروض: <strong className="text-blue-600">الأسبوع {currentWeek}</strong></>
+            ? <><strong className="text-blue-600">{currentWeekLabel}</strong></>
+            : <>المعروض: <strong className="text-blue-600">{currentWeekLabel}</strong></>
           }
         </span>
       </div>
