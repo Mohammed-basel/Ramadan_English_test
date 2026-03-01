@@ -146,22 +146,22 @@ export function ProductTicker({
 <div className="text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-lg px-3 py-1">
   {lang === 'en'
     ? (currentWeek === 3
-      ? 'Average prices – Week 3 Ramadan'
+      ? 'Average prices – Week 1 Ramadan'
       : currentWeek === 4
-      ? 'Average prices – Week 4 Ramadan'
+      ? 'Average prices – Week 2 Ramadan'
       : currentWeek === 5
-      ? 'Average prices – Week 5 Ramadan'
+      ? 'Average prices – Week 3 Ramadan'
       : currentWeek === 6
-      ? 'Average prices – Week 6 Ramadan'
+      ? 'Average prices – Week 4 Ramadan'
       : 'Average prices')
     : (currentWeek === 3
-      ? 'متوسط أسعار الأسبوع الثالث من رمضان'
+      ? 'متوسط أسعار الأسبوع الاول من رمضان'
       : currentWeek === 4
-      ? 'متوسط أسعار الأسبوع الرابع من رمضان'
+      ? 'متوسط أسعار الأسبوع الثاني من رمضان'
       : currentWeek === 5
-      ? 'متوسط أسعار الأسبوع الخامس من رمضان'
+      ? 'متوسط أسعار الأسبوع الثالث من رمضان'
       : currentWeek === 6
-      ? 'متوسط أسعار الأسبوع السادس من رمضان'
+      ? 'متوسط أسعار الأسبوع الرابع من رمضان'
       : 'متوسط أسعار')
   }
   {weekDateIso && (
