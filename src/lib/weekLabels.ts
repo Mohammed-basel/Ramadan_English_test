@@ -147,9 +147,18 @@ export function formatWeekLabel(weekNumber: number, language: Language, weekDate
   }
 
   // Week 3: rename to “Week 1 Ramadan / الأسبوع الأول من رمضان”
+  // Week 4: rename to “Week 2 Ramadan / الأسبوع الثاني من رمضان”
+  // Week 5: rename to “Week 3 Ramadan / الأسبوع الثالث من رمضان”
+  // Week 6: rename to “Week 4 Ramadan / الأسبوع الرابع من رمضان”
   const base =
     weekNumber === 3
       ? (language === 'ar' ? 'الأسبوع الأول من رمضان' : 'Week 1 Ramadan')
+      : weekNumber === 4
+      ? (language === 'ar' ? 'الأسبوع الثاني من رمضان' : 'Week 2 Ramadan')
+      : weekNumber === 5
+      ? (language === 'ar' ? 'الأسبوع الثالث من رمضان' : 'Week 3 Ramadan')
+      : weekNumber === 6
+      ? (language === 'ar' ? 'الأسبوع الرابع من رمضان' : 'Week 4 Ramadan')
       : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
 
   if (dateOnly) return `${base} (${dateOnly})`;
