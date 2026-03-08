@@ -10,12 +10,12 @@ export const STRINGS = {
     en: "Monitoring and analyzing the prices of selected consumer goods during the holy month “Ramadan”",
   },
   currentUpdate: {
-    ar: "التحديث الحالي: 2/3/2026",
-    en: "Current Update: 2/3/2026",
+    ar: "التحديث الحالي: 9/3/2026",
+    en: "Current Update: 9/3/2026",
   },
   nextUpdate: {
-    ar: "التحديث القادم: الاثنين، 9/3/2026",
-    en: "Next Update: Monday, 9/3/2026",
+    ar: "التحديث القادم: الاثنين، 16/3/2026",
+    en: "Next Update: Monday, 16/3/2026",
   },
   complaints: {
     ar: "رقم شكاوى وزارة الاقتصاد الوطني: 129",
