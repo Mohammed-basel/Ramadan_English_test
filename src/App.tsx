@@ -43,7 +43,7 @@ const adherenceByWeek: Record<number, number> = {
   3: 32,
   4: 40,
   5: 44,
-  6: ,
+  6: 48,
 };
 
 const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
