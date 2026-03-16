@@ -42,7 +42,8 @@ const adherenceByWeek: Record<number, number> = {
   2: 28,
   3: 32,
   4: 40,
-  5:44,
+  5: 44,
+  6: ,
 };
 
 const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
@@ -336,11 +337,11 @@ URL.revokeObjectURL(url);
               <p className="font-semibold">
                 {lang === 'en' ? (
                   <>
-                    <span className="text-gray-700">Next Update:</span> Monday, 16/3/2026 at 10:00 AM
+                    <span className="text-gray-700">Next Update:</span> Monday, 23/3/2026 at 10:00 AM
                   </>
                 ) : (
                   <>
-                    <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 16/3/2026 الساعة 10:00 صباحًا
+                    <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/3/2026 الساعة 10:00 صباحًا
                   </>
                 )}
               </p>
