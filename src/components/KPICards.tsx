@@ -250,7 +250,7 @@ const adherenceLevel = adherence >= 70 ? 'good' : adherence >= 40 ? 'warn' : 'ba
           text: 'text-amber-800',
           value: 'text-amber-800',
           icon: <AlertTriangle className="text-amber-600" width={34} height={34} />,
-          hint: lang === 'en' ? 'Needs monitoring' : 'يحتاج متابعة',
+          hint: lang === 'en' ? 'Requires moderate monitoring' : 'بحاجة الى متابعة متوسطة',
         }
       : {
           ring: 'bg-red-100',
