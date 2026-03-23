@@ -142,9 +142,9 @@ export function formatWeekLabel(weekNumber: number, language: Language, weekDate
   const range = getWeekDateRangeLabel(weekNumber, language);
   const dateOnly = explicit || range;
 
-  if (weekNumber === 1 || weekNumber === 2) {
-    return dateOnly ? `${dateOnly}` : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
-  }
+if (weekNumber === 1 || weekNumber === 2 || weekNumber === 7) {
+  return dateOnly ? `${dateOnly}` : (language === 'ar' ? `الأسبوع ${weekNumber}` : `Week ${weekNumber}`);
+}
 
   // Week 3: rename to “Week 1 Ramadan / الأسبوع الأول من رمضان”
   // Week 4: rename to “Week 2 Ramadan / الأسبوع الثاني من رمضان”
