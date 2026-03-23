@@ -44,7 +44,7 @@ const adherenceByWeek: Record<number, number> = {
   4: 40,
   5: 44,
   6: 48,
-  7: 51,
+  7: 53,
 };
 
 const manualAdherence = adherenceByWeek[currentWeek] ?? 0;
@@ -335,6 +335,17 @@ URL.revokeObjectURL(url);
                 <p className="font-semibold">
                   <span className="text-gray-700">{t('currentUpdate', lang)}</span>
                 </p>
+              <p className="font-semibold">
+                {lang === 'en' ? (
+                  <>
+                    <span className="text-gray-700">The platform will be closed:</span> Monday, 30/3/2026 at 10:00 AM
+                  </>
+                ) : (
+                  <>
+                    <span className="text-gray-700">سيتم إغلاق المنصة:</span> الاثنين الموافق 30/3/2026 الساعة 10:00 صباحًا
+                  </>
+                )}
+              </p>
               </div>
             </div>
         </header>

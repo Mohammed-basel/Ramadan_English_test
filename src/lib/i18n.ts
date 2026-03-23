@@ -13,6 +13,10 @@ export const STRINGS = {
     ar: "التحديث الحالي: 23/3/2026",
     en: "Current Update: 23/3/2026",
   },
+  nextUpdate: {
+    ar: "سيتم إغلاق المنصة: الاثنين، 30/3/2026",
+    en: "The platform will be closed: Monday, 30/3/2026",
+  },
   complaints: {
     ar: "رقم شكاوى وزارة الاقتصاد الوطني: 129",
     en: "Ministry of National Economy Complaints Number: 129",
