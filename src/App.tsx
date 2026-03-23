@@ -334,17 +334,6 @@ URL.revokeObjectURL(url);
                 <p className="font-semibold">
                   <span className="text-gray-700">{t('currentUpdate', lang)}</span>
                 </p>
-              <p className="font-semibold">
-                {lang === 'en' ? (
-                  <>
-                    <span className="text-gray-700">Next Update:</span> Monday, 23/3/2026 at 10:00 AM
-                  </>
-                ) : (
-                  <>
-                    <span className="text-gray-700">التحديث القادم:</span> الاثنين الموافق 23/3/2026 الساعة 10:00 صباحًا
-                  </>
-                )}
-              </p>
               </div>
             </div>
         </header>
